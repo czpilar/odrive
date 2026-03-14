@@ -34,6 +34,13 @@
         </developer>
     </developers>
 
+    <scm>
+        <connection>scm:git:https://github.com/czpilar/odrive.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/czpilar/odrive.git</developerConnection>
+        <url>https://github.com/czpilar/odrive</url>
+        <tag>HEAD</tag>
+    </scm>
+
     <properties>
         <java.target>25</java.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
