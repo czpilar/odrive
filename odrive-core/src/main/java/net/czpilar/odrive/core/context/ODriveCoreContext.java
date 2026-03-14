@@ -49,7 +49,7 @@ public class ODriveCoreContext {
                 .clientAuthenticationMethod(ClientAuthenticationMethod.NONE)
                 .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
                 .redirectUri(ODriveSetting.REDIRECT_URI)
-                .scope("Files.ReadWrite", "User.Read", "offline_access")
+                .scope(ODriveSetting.SCOPES)
                 .authorizationUri(setting.getAuthorizationEndpoint())
                 .tokenUri(setting.getTokenEndpoint())
                 .build();

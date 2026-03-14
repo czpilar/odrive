@@ -3,6 +3,8 @@ package net.czpilar.odrive.core.setting;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 /**
  * Holder for oDrive settings including Microsoft app registration details.
  *
@@ -14,7 +16,7 @@ public class ODriveSetting {
     public static final String APPLICATION_NAME = "odrive";
 
     public static final String REDIRECT_URI = "https://login.microsoftonline.com/common/oauth2/nativeclient";
-    public static final String SCOPES = "Files.ReadWrite User.Read offline_access";
+    public static final List<String> SCOPES = List.of("Files.ReadWrite", "User.Read", "offline_access");
 
     private final String applicationVersion;
     private final String clientId;
@@ -22,7 +24,7 @@ public class ODriveSetting {
 
     public ODriveSetting(@Value("${odrive.version}") String applicationVersion,
                          @Value("${odrive.core.drive.clientId}") String clientId,
-                         @Value("${odrive.core.drive.tenant:consumers}") String tenant) {
+                         @Value("${odrive.core.drive.tenant:common}") String tenant) {
         this.applicationVersion = applicationVersion;
         this.clientId = clientId;
         this.tenant = tenant;
