@@ -67,13 +67,26 @@ public class AuthorizationCodeWaiter {
                         .filter(s -> !s.isBlank())
                         .findFirst();
 
-                String message = code.map(s -> "Your authorization code is: " + s).orElse("");
-                System.out.println(message);
+                String consoleMessage = code.map(s -> "Your authorization code is: " + s).orElse("Authorization code not found in redirect.");
+                System.out.println(consoleMessage);
 
-                exchange.sendResponseHeaders(200, message.getBytes().length);
+                String html = code.map(_ -> """
+                        <html><body style="font-family:sans-serif;text-align:center;padding:50px;">
+                        <h1 style="color:green;">&#10004; Authorization Successful</h1>
+                        <p>oDrive application has been authorized. You can close this window.</p>
+                        </body></html>"""
+                ).orElse("""
+                        <html><body style="font-family:sans-serif;text-align:center;padding:50px;">
+                        <h1 style="color:red;">&#10008; Authorization Failed</h1>
+                        <p>Authorization code was not found. Please try again.</p>
+                        </body></html>""");
+
+                byte[] response = html.getBytes();
+                exchange.getResponseHeaders().set("Content-Type", "text/html; charset=UTF-8");
+                exchange.sendResponseHeaders(200, response.length);
 
                 OutputStream responseBody = exchange.getResponseBody();
-                responseBody.write(message.getBytes());
+                responseBody.write(response);
                 responseBody.close();
             }
         }
