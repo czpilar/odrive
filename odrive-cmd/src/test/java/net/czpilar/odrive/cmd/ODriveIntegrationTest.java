@@ -44,6 +44,11 @@ public class ODriveIntegrationTest {
         ODrive.main(new String[]{"-a", "auth_code", "-p", PROPERTIES});
     }
 
+    @Test
+    public void testShowAuthLinkAndAuthorize() {
+        ODrive.main(new String[]{"-l", "-a", "-p", PROPERTIES});
+    }
+
     private void createFileIfNotExist(String filename) throws IOException {
         File file = new File(filename);
         if (!file.exists()) {

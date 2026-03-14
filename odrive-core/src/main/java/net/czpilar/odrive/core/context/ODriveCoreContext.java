@@ -48,7 +48,7 @@ public class ODriveCoreContext {
                 .clientId(setting.getClientId())
                 .clientAuthenticationMethod(ClientAuthenticationMethod.NONE)
                 .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-                .redirectUri(ODriveSetting.REDIRECT_URI)
+                .redirectUri(setting.getRedirectUri())
                 .scope(ODriveSetting.SCOPES)
                 .authorizationUri(setting.getAuthorizationEndpoint())
                 .tokenUri(setting.getTokenEndpoint())

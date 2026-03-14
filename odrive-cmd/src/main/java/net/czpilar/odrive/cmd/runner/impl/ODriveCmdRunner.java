@@ -19,6 +19,7 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Command line runner implementation.
@@ -49,6 +50,13 @@ public class ODriveCmdRunner implements IODriveCmdRunner {
     private ODriveSetting oDriveSetting;
 
     private PropertiesODriveCredential propertiesODriveCredential;
+
+    private AuthorizationCodeWaiter codeWaiter;
+
+    @Autowired
+    public void setCodeWaiter(AuthorizationCodeWaiter codeWaiter) {
+        this.codeWaiter = codeWaiter;
+    }
 
     @Autowired
     public void setCommandLineParser(CommandLineParser commandLineParser) {
@@ -107,16 +115,21 @@ public class ODriveCmdRunner implements IODriveCmdRunner {
         if (cmd.hasOption(OPTION_LINK)) {
             System.out.println("Please authorize oDrive application with following link:\n");
             System.out.println(authorizationService.getAuthorizationURL());
-            System.out.println("\nAfter authorizing, copy the full redirect URL from the browser address bar and use -a option with the code parameter from the URL.");
         }
     }
 
     private void doAuthorizationOption(CommandLine cmd) {
         if (cmd.hasOption(OPTION_AUTHORIZATION)) {
-            Credential credential = authorizationService.authorize(cmd.getOptionValue(OPTION_AUTHORIZATION));
-            if (credential != null) {
-                System.out.println("Authorization was successful.");
+            Optional<String> optionValue = Optional.ofNullable(cmd.getOptionValue(OPTION_AUTHORIZATION));
+            if (optionValue.isEmpty()) {
+                optionValue = codeWaiter.getCode();
             }
+            optionValue.ifPresent(code -> {
+                Credential credential = authorizationService.authorize(code);
+                if (credential != null) {
+                    System.out.println("Authorization was successful.");
+                }
+            });
         }
     }
 
