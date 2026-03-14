@@ -15,7 +15,7 @@ public class ODriveSetting {
 
     public static final String APPLICATION_NAME = "odrive";
 
-    public static final String REDIRECT_URI = "https://login.microsoftonline.com/common/oauth2/nativeclient";
+    public static final String REDIRECT_URI = "http://localhost";
     public static final List<String> SCOPES = List.of("Files.ReadWrite", "User.Read", "offline_access");
 
     private final String applicationVersion;

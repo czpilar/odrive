@@ -7,6 +7,10 @@ package net.czpilar.odrive.core.exception;
  */
 public class AuthorizationFailedException extends ODriveException {
 
+    public AuthorizationFailedException(String message) {
+        super(message);
+    }
+
     public AuthorizationFailedException(String message, Throwable cause) {
         super(message, cause);
     }

@@ -107,7 +107,7 @@ public class ODriveCmdRunner implements IODriveCmdRunner {
         if (cmd.hasOption(OPTION_LINK)) {
             System.out.println("Please authorize oDrive application with following link:\n");
             System.out.println(authorizationService.getAuthorizationURL());
-            System.out.println("\nAfter authorizing, copy the code from the redirect URL and use -a option.");
+            System.out.println("\nAfter authorizing, copy the full redirect URL from the browser address bar and use -a option with the code parameter from the URL.");
         }
     }
 
