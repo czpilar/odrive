@@ -8,6 +8,7 @@ import net.czpilar.odrive.core.setting.ODriveSetting;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.*;
+import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter;
 import org.springframework.security.oauth2.client.endpoint.OAuth2AccessTokenResponseClient;
 import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCodeGrantRequest;
 import org.springframework.security.oauth2.client.endpoint.OAuth2RefreshTokenGrantRequest;
@@ -16,6 +17,9 @@ import org.springframework.security.oauth2.client.endpoint.RestClientRefreshToke
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
+import org.springframework.web.client.RestTemplate;
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * Spring configuration for oDrive core providing OneDrive client
@@ -62,8 +66,24 @@ public class ODriveCoreContext {
     }
 
     @Bean
+    public RestTemplate graphRestTemplate() {
+        RestTemplate restTemplate = new RestTemplate();
+
+        // Configure Jackson 3 message converter
+        JacksonJsonHttpMessageConverter jacksonConverter = new JacksonJsonHttpMessageConverter(
+                JsonMapper.builder()
+                        .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+                        .build()
+        );
+        restTemplate.getMessageConverters().removeIf(c -> c instanceof JacksonJsonHttpMessageConverter);
+        restTemplate.getMessageConverters().addFirst(jacksonConverter);
+
+        return restTemplate;
+    }
+
+    @Bean
     @Scope("prototype")
-    public OneDriveClient oneDriveClient() {
+    public OneDriveClient oneDriveClient(RestTemplate graphRestTemplate) {
         Credential credential = credentialLoader.getCredential();
         String accessToken = credential.accessToken();
 
@@ -73,6 +93,6 @@ public class ODriveCoreContext {
             accessToken = refreshed.accessToken();
         }
 
-        return new OneDriveClient(accessToken);
+        return new OneDriveClient(graphRestTemplate, accessToken);
     }
 }

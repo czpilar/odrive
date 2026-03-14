@@ -1,21 +1,16 @@
 package net.czpilar.odrive.core.client;
 
-import tools.jackson.databind.DeserializationFeature;
-import tools.jackson.databind.ObjectMapper;
-import tools.jackson.databind.json.JsonMapper;
 import net.czpilar.odrive.core.model.DriveItem;
 import net.czpilar.odrive.core.model.UploadSession;
+import org.springframework.http.*;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
 import java.net.URLEncoder;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.Map;
 
 /**
  * HTTP client for Microsoft Graph API OneDrive operations.
@@ -26,16 +21,12 @@ public class OneDriveClient {
 
     private static final String GRAPH_BASE_URL = "https://graph.microsoft.com/v1.0";
 
-    private final HttpClient httpClient;
+    private final RestTemplate restTemplate;
     private final String accessToken;
-    private final ObjectMapper objectMapper;
 
-    public OneDriveClient(String accessToken) {
+    public OneDriveClient(RestTemplate restTemplate, String accessToken) {
+        this.restTemplate = restTemplate;
         this.accessToken = accessToken;
-        this.httpClient = HttpClient.newHttpClient();
-        this.objectMapper = JsonMapper.builder()
-                .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-                .build();
     }
 
     /**
@@ -48,12 +39,14 @@ public class OneDriveClient {
     public DriveItem getItemByPath(String path) {
         String encodedPath = encodePath(path);
         String url = GRAPH_BASE_URL + "/me/drive/root:/" + encodedPath;
-        HttpResponse<String> response = doGet(url);
-        if (response.statusCode() == 404) {
+        try {
+            ResponseEntity<DriveItem> response = restTemplate.exchange(url, HttpMethod.GET, new HttpEntity<>(authHeaders()), DriveItem.class);
+            return response.getBody();
+        } catch (HttpClientErrorException.NotFound e) {
             return null;
+        } catch (HttpClientErrorException e) {
+            throw new OneDriveClientException("API call failed with status " + e.getStatusCode() + ": " + e.getResponseBodyAsString(), e);
         }
-        checkResponse(response);
-        return fromJson(response.body(), DriveItem.class);
     }
 
     /**
@@ -65,10 +58,13 @@ public class OneDriveClient {
      */
     public DriveItem createFolderAtRoot(String name) {
         String url = GRAPH_BASE_URL + "/me/drive/root/children";
-        String body = toJson(Map.of("name", name, "folder", Map.of()));
-        HttpResponse<String> response = doPost(url, body, "application/json");
-        checkResponse(response);
-        return fromJson(response.body(), DriveItem.class);
+        try {
+            HttpEntity<CreateFolderRequest> entity = new HttpEntity<>(new CreateFolderRequest(name), authHeaders());
+            ResponseEntity<DriveItem> response = restTemplate.exchange(url, HttpMethod.POST, entity, DriveItem.class);
+            return response.getBody();
+        } catch (HttpClientErrorException e) {
+            throw new OneDriveClientException("API call failed with status " + e.getStatusCode() + ": " + e.getResponseBodyAsString(), e);
+        }
     }
 
     /**
@@ -81,10 +77,13 @@ public class OneDriveClient {
      */
     public DriveItem createFolder(String parentId, String name) {
         String url = GRAPH_BASE_URL + "/me/drive/items/" + parentId + "/children";
-        String body = toJson(Map.of("name", name, "folder", Map.of()));
-        HttpResponse<String> response = doPost(url, body, "application/json");
-        checkResponse(response);
-        return fromJson(response.body(), DriveItem.class);
+        try {
+            HttpEntity<CreateFolderRequest> entity = new HttpEntity<>(new CreateFolderRequest(name), authHeaders());
+            ResponseEntity<DriveItem> response = restTemplate.exchange(url, HttpMethod.POST, entity, DriveItem.class);
+            return response.getBody();
+        } catch (HttpClientErrorException e) {
+            throw new OneDriveClientException("API call failed with status " + e.getStatusCode() + ": " + e.getResponseBodyAsString(), e);
+        }
     }
 
     /**
@@ -100,17 +99,15 @@ public class OneDriveClient {
         String url = GRAPH_BASE_URL + "/me/drive/root:/" + encodedPath + ":/content";
         try {
             byte[] content = Files.readAllBytes(localFile.toPath());
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(url))
-                    .header("Authorization", "Bearer " + accessToken)
-                    .header("Content-Type", "application/octet-stream")
-                    .PUT(HttpRequest.BodyPublishers.ofByteArray(content))
-                    .build();
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            checkResponse(response);
-            return fromJson(response.body(), DriveItem.class);
-        } catch (IOException | InterruptedException e) {
-            throw new OneDriveClientException("Failed to upload file.", e);
+            HttpHeaders headers = authHeaders();
+            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+            HttpEntity<byte[]> entity = new HttpEntity<>(content, headers);
+            ResponseEntity<DriveItem> response = restTemplate.exchange(url, HttpMethod.PUT, entity, DriveItem.class);
+            return response.getBody();
+        } catch (IOException e) {
+            throw new OneDriveClientException("Failed to read local file.", e);
+        } catch (HttpClientErrorException e) {
+            throw new OneDriveClientException("API call failed with status " + e.getStatusCode() + ": " + e.getResponseBodyAsString(), e);
         }
     }
 
@@ -124,9 +121,13 @@ public class OneDriveClient {
     public UploadSession createUploadSession(String remotePath) {
         String encodedPath = encodePath(remotePath);
         String url = GRAPH_BASE_URL + "/me/drive/root:/" + encodedPath + ":/createUploadSession";
-        HttpResponse<String> response = doPost(url, "{}", "application/json");
-        checkResponse(response);
-        return fromJson(response.body(), UploadSession.class);
+        try {
+            HttpEntity<Void> entity = new HttpEntity<>(authHeaders());
+            ResponseEntity<UploadSession> response = restTemplate.exchange(url, HttpMethod.POST, entity, UploadSession.class);
+            return response.getBody();
+        } catch (HttpClientErrorException e) {
+            throw new OneDriveClientException("API call failed with status " + e.getStatusCode() + ": " + e.getResponseBodyAsString(), e);
+        }
     }
 
     /**
@@ -142,72 +143,24 @@ public class OneDriveClient {
      */
     public DriveItem uploadChunk(String uploadUrl, byte[] data, long rangeStart, long rangeEnd, long totalSize) {
         try {
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(uploadUrl))
-                    .header("Content-Range", "bytes " + rangeStart + "-" + rangeEnd + "/" + totalSize)
-                    .header("Content-Length", String.valueOf(data.length))
-                    .PUT(HttpRequest.BodyPublishers.ofByteArray(data))
-                    .build();
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            if (response.statusCode() == 200 || response.statusCode() == 201) {
-                return fromJson(response.body(), DriveItem.class);
-            } else if (response.statusCode() == 202) {
-                return null; // more chunks needed
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Content-Range", "bytes " + rangeStart + "-" + rangeEnd + "/" + totalSize);
+            headers.setContentLength(data.length);
+            HttpEntity<byte[]> entity = new HttpEntity<>(data, headers);
+            ResponseEntity<DriveItem> response = restTemplate.exchange(uploadUrl, HttpMethod.PUT, entity, DriveItem.class);
+            if (response.getStatusCode().value() == 200 || response.getStatusCode().value() == 201) {
+                return response.getBody();
             }
-            checkResponse(response);
-            return null;
-        } catch (IOException | InterruptedException e) {
-            throw new OneDriveClientException("Failed to upload chunk.", e);
+            return null; // 202 - more chunks needed
+        } catch (HttpClientErrorException e) {
+            throw new OneDriveClientException("API call failed with status " + e.getStatusCode() + ": " + e.getResponseBodyAsString(), e);
         }
     }
 
-    private <T> T fromJson(String json, Class<T> type) {
-        try {
-            return objectMapper.readValue(json, type);
-        } catch (tools.jackson.core.JacksonException e) {
-            throw new OneDriveClientException("Failed to parse JSON response.", e);
-        }
-    }
-
-    private String toJson(Object object) {
-        try {
-            return objectMapper.writeValueAsString(object);
-        } catch (tools.jackson.core.JacksonException e) {
-            throw new OneDriveClientException("Failed to serialize JSON request.", e);
-        }
-    }
-
-    private HttpResponse<String> doGet(String url) {
-        try {
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(url))
-                    .header("Authorization", "Bearer " + accessToken)
-                    .GET()
-                    .build();
-            return httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-        } catch (IOException | InterruptedException e) {
-            throw new OneDriveClientException("HTTP GET request failed.", e);
-        }
-    }
-
-    private HttpResponse<String> doPost(String url, String body, String contentType) {
-        try {
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(url))
-                    .header("Authorization", "Bearer " + accessToken)
-                    .header("Content-Type", contentType)
-                    .POST(HttpRequest.BodyPublishers.ofString(body))
-                    .build();
-            return httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-        } catch (IOException | InterruptedException e) {
-            throw new OneDriveClientException("HTTP POST request failed.", e);
-        }
-    }
-
-    private void checkResponse(HttpResponse<String> response) {
-        if (response.statusCode() >= 400) {
-            throw new OneDriveClientException("API call failed with status " + response.statusCode() + ": " + response.body());
-        }
+    private HttpHeaders authHeaders() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(accessToken);
+        return headers;
     }
 
     private String encodePath(String path) {
