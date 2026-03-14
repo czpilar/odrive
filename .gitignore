@@ -1,0 +1,9 @@
+/odrive.iml
+/.idea
+/target
+/odrive-cmd/odrive.properties
+/odrive-cmd/target
+/odrive-core/target
+/odrive-cmd/dropdrive-cmd.iml
+/odrive-core/dropdrive-core.iml
+/odrive-parent.iml
