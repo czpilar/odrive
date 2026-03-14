@@ -1,7 +1,6 @@
 package net.czpilar.odrive.cmd;
 
 import org.apache.commons.io.FileUtils;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -11,7 +10,6 @@ import java.nio.charset.Charset;
 /**
  * @author David Pilar (david@czpilar.net)
  */
-@Disabled("Integration test for ODrive command line application. Requires valid credentials and network connection.")
 public class ODriveIntegrationTest {
 
     private static final String PROPERTIES = "odrive.properties";
