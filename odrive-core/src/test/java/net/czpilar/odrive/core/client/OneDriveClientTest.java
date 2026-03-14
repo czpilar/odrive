@@ -2,6 +2,7 @@ package net.czpilar.odrive.core.client;
 
 import net.czpilar.odrive.core.model.DriveItem;
 import net.czpilar.odrive.core.model.UploadSession;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -35,11 +36,17 @@ public class OneDriveClientTest {
     private RestTemplate restTemplate;
 
     private OneDriveClient client;
+    private AutoCloseable autoCloseable;
 
     @BeforeEach
     public void before() {
-        MockitoAnnotations.openMocks(this);
+        autoCloseable = MockitoAnnotations.openMocks(this);
         client = new OneDriveClient(restTemplate, ACCESS_TOKEN);
+    }
+
+    @AfterEach
+    public void after() throws Exception {
+        autoCloseable.close();
     }
 
     private static DriveItem driveItem(String id) {
@@ -50,7 +57,6 @@ public class OneDriveClientTest {
         return new DriveItem(null, null, null, null, null, null, null, null);
     }
 
-    // --- getItemByPath ---
 
     @Test
     public void testGetItemByPath() {
@@ -114,7 +120,6 @@ public class OneDriveClientTest {
         assertEquals(GRAPH_BASE_URL + "/me/drive/root:/My%20Documents/my%20file.txt", urlCaptor.getValue());
     }
 
-    // --- createFolderAtRoot ---
 
     @Test
     public void testCreateFolderAtRoot() {
@@ -142,7 +147,6 @@ public class OneDriveClientTest {
         assertThrows(OneDriveClient.OneDriveClientException.class, () -> client.createFolderAtRoot("TestFolder"));
     }
 
-    // --- createFolder ---
 
     @Test
     public void testCreateFolder() {
@@ -170,7 +174,6 @@ public class OneDriveClientTest {
         assertThrows(OneDriveClient.OneDriveClientException.class, () -> client.createFolder("parent-id", "Folder"));
     }
 
-    // --- uploadSmallFile ---
 
     @Test
     public void testUploadSmallFile(@TempDir Path tempDir) throws IOException {
@@ -213,7 +216,6 @@ public class OneDriveClientTest {
                 () -> client.uploadSmallFile("Documents/test.txt", localFile));
     }
 
-    // --- createUploadSession ---
 
     @Test
     public void testCreateUploadSession() {
@@ -242,7 +244,6 @@ public class OneDriveClientTest {
                 () -> client.createUploadSession("Documents/large-file.zip"));
     }
 
-    // --- uploadChunk ---
 
     @Test
     public void testUploadChunkComplete() {
@@ -314,7 +315,6 @@ public class OneDriveClientTest {
         assertEquals(1024, headers.getContentLength());
     }
 
-    // --- interceptor ---
 
     @Test
     public void testInterceptorIsRegistered() {
@@ -327,7 +327,6 @@ public class OneDriveClientTest {
         assertEquals(1, interceptors.size());
     }
 
-    // --- OneDriveClientException ---
 
     @Test
     public void testOneDriveClientExceptionWithMessage() {

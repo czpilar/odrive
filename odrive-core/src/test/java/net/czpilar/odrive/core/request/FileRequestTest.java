@@ -5,6 +5,7 @@ import net.czpilar.odrive.core.exception.ODriveException;
 import net.czpilar.odrive.core.listener.IFileUploadProgressListener;
 import net.czpilar.odrive.core.model.DriveItem;
 import net.czpilar.odrive.core.model.UploadSession;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -28,9 +29,16 @@ public class FileRequestTest {
     @Mock
     private IFileUploadProgressListener progressListener;
 
+    private AutoCloseable autoCloseable;
+
     @BeforeEach
     public void before() {
-        MockitoAnnotations.openMocks(this);
+        autoCloseable = MockitoAnnotations.openMocks(this);
+    }
+
+    @AfterEach
+    public void after() throws Exception {
+        autoCloseable.close();
     }
 
     private static DriveItem driveItem(String id) {
@@ -41,7 +49,6 @@ public class FileRequestTest {
         return new DriveItem(null, null, null, null, null, null, null, null);
     }
 
-    // --- Small file upload ---
 
     @Test
     public void testExecuteSmallFile(@TempDir Path tempDir) throws IOException {
@@ -81,7 +88,6 @@ public class FileRequestTest {
         verify(client).uploadSmallFile("remote/small.txt", localFile);
     }
 
-    // --- Chunked upload ---
 
     @Test
     public void testExecuteChunkedUpload(@TempDir Path tempDir) throws IOException {
@@ -143,7 +149,6 @@ public class FileRequestTest {
         assertThrows(ODriveException.class, () -> request.execute());
     }
 
-    // --- Retry logic ---
 
     @Test
     public void testUploadChunkRetriesOnFailure(@TempDir Path tempDir) throws IOException {
@@ -189,7 +194,6 @@ public class FileRequestTest {
                 .uploadChunk(anyString(), any(byte[].class), anyLong(), anyLong(), anyLong());
     }
 
-    // --- Constants ---
 
     @Test
     public void testChunkSizeIsMultipleOf320KiB() {
@@ -206,7 +210,6 @@ public class FileRequestTest {
         assertEquals(5, FileRequest.CHUNK_RETRIES);
     }
 
-    // --- Factory method ---
 
     @Test
     public void testCreateFactoryMethod(@TempDir Path tempDir) throws IOException {

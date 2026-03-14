@@ -24,6 +24,7 @@ import static org.mockito.Mockito.*;
 public class ODriveCmdRunnerTest {
 
     private final ODriveCmdRunner runner = new ODriveCmdRunner();
+
     @Mock
     private CommandLineParser commandLineParser;
     @Mock
@@ -61,6 +62,10 @@ public class ODriveCmdRunnerTest {
     @AfterEach
     public void after() throws Exception {
         autoCloseable.close();
+    }
+
+    private static DriveItem driveItem(String name, String eTag) {
+        return new DriveItem(null, name, null, eTag, null, null, null, null);
     }
 
     @Test
@@ -120,7 +125,7 @@ public class ODriveCmdRunnerTest {
     public void testRunWhereCommandLineHasOnlyPropertiesOption() throws ParseException, IOException {
         String appName = "application-name";
         String[] args = {"arg1", "arg2"};
-        Option[] optionList = {mock(Option.class)};
+        Option[] optionList = {Option.builder("p").build()};
         when(commandLineParser.parse(any(Options.class), any(String[].class))).thenReturn(commandLine);
         when(commandLine.getOptions()).thenReturn(optionList);
         when(commandLine.hasOption(ODriveCmdRunner.OPTION_PROPERTIES)).thenReturn(true);
@@ -151,7 +156,7 @@ public class ODriveCmdRunnerTest {
         String appVersion = "application-version";
         String propertiesValue = "test-properties-value";
         String[] args = {"arg1", "arg2"};
-        Option[] optionList = {mock(Option.class), mock(Option.class)};
+        Option[] optionList = {Option.builder("p").build(), Option.builder("v").build()};
         when(commandLineParser.parse(any(Options.class), any(String[].class))).thenReturn(commandLine);
         when(commandLine.getOptions()).thenReturn(optionList);
         when(commandLine.hasOption(ODriveCmdRunner.OPTION_PROPERTIES)).thenReturn(true);
@@ -194,7 +199,7 @@ public class ODriveCmdRunnerTest {
         String appName = "application-name";
         String propertiesValue = "test-properties-value";
         String[] args = {"arg1", "arg2"};
-        Option[] optionList = {mock(Option.class), mock(Option.class)};
+        Option[] optionList = {Option.builder("p").build(), Option.builder("h").build()};
         when(commandLineParser.parse(any(Options.class), any(String[].class))).thenReturn(commandLine);
         when(commandLine.getOptions()).thenReturn(optionList);
         when(commandLine.hasOption(ODriveCmdRunner.OPTION_PROPERTIES)).thenReturn(true);
@@ -237,7 +242,7 @@ public class ODriveCmdRunnerTest {
     public void testRunWhereCommandLineHasPropertiesAndLinkOptions() throws ParseException {
         String propertiesValue = "test-properties-value";
         String[] args = {"arg1", "arg2"};
-        Option[] optionList = {mock(Option.class), mock(Option.class)};
+        Option[] optionList = {Option.builder("p").build(), Option.builder("l").build()};
         when(commandLineParser.parse(any(Options.class), any(String[].class))).thenReturn(commandLine);
         when(commandLine.getOptions()).thenReturn(optionList);
         when(commandLine.hasOption(ODriveCmdRunner.OPTION_PROPERTIES)).thenReturn(true);
@@ -280,7 +285,7 @@ public class ODriveCmdRunnerTest {
         String propertiesValue = "test-properties-value";
         String authorizationValue = "test-authorization-value";
         String[] args = {"arg1", "arg2"};
-        Option[] optionList = {mock(Option.class), mock(Option.class)};
+        Option[] optionList = {Option.builder("p").build(), Option.builder("a").build()};
         when(commandLineParser.parse(any(Options.class), any(String[].class))).thenReturn(commandLine);
         when(commandLine.getOptions()).thenReturn(optionList);
         when(commandLine.hasOption(ODriveCmdRunner.OPTION_PROPERTIES)).thenReturn(true);
@@ -325,7 +330,7 @@ public class ODriveCmdRunnerTest {
         String propertiesValue = "test-properties-value";
         String authorizationValue = "test-authorization-value";
         String[] args = {"arg1", "arg2"};
-        Option[] optionList = {mock(Option.class), mock(Option.class)};
+        Option[] optionList = {Option.builder("p").build(), Option.builder("a").build()};
         when(commandLineParser.parse(any(Options.class), any(String[].class))).thenReturn(commandLine);
         when(commandLine.getOptions()).thenReturn(optionList);
         when(commandLine.hasOption(ODriveCmdRunner.OPTION_PROPERTIES)).thenReturn(true);
@@ -336,7 +341,7 @@ public class ODriveCmdRunnerTest {
         when(commandLine.hasOption(ODriveCmdRunner.OPTION_FILE)).thenReturn(false);
         when(commandLine.getOptionValue(ODriveCmdRunner.OPTION_PROPERTIES)).thenReturn(propertiesValue);
         when(commandLine.getOptionValue(ODriveCmdRunner.OPTION_AUTHORIZATION)).thenReturn(authorizationValue);
-        when(authorizationService.authorize(authorizationValue)).thenReturn(mock(Credential.class));
+        when(authorizationService.authorize(authorizationValue)).thenReturn(new Credential("token", "refresh"));
 
         runner.run(args);
 
@@ -370,7 +375,7 @@ public class ODriveCmdRunnerTest {
         String propertiesValue = "test-properties-value";
         String authorizationValue = "test-authorization-value";
         String[] args = {"arg1", "arg2"};
-        Option[] optionList = {mock(Option.class), mock(Option.class)};
+        Option[] optionList = {Option.builder("p").build(), Option.builder("a").build()};
         when(commandLineParser.parse(any(Options.class), any(String[].class))).thenReturn(commandLine);
         when(commandLine.getOptions()).thenReturn(optionList);
         when(commandLine.hasOption(ODriveCmdRunner.OPTION_PROPERTIES)).thenReturn(true);
@@ -381,7 +386,7 @@ public class ODriveCmdRunnerTest {
         when(commandLine.hasOption(ODriveCmdRunner.OPTION_FILE)).thenReturn(false);
         when(commandLine.getOptionValue(ODriveCmdRunner.OPTION_PROPERTIES)).thenReturn(propertiesValue);
         when(commandLine.getOptionValue(ODriveCmdRunner.OPTION_AUTHORIZATION)).thenReturn(null);
-        when(authorizationService.authorize(authorizationValue)).thenReturn(mock(Credential.class));
+        when(authorizationService.authorize(authorizationValue)).thenReturn(new Credential("token", "refresh"));
         when(codeWaiter.getCode()).thenReturn(Optional.of(authorizationValue));
 
         runner.run(args);
@@ -418,7 +423,7 @@ public class ODriveCmdRunnerTest {
         String optionFile = "test-file-value";
         List<String> optionFiles = List.of(optionFile);
         String[] args = {"arg1", "arg2"};
-        Option[] optionList = {mock(Option.class), mock(Option.class)};
+        Option[] optionList = {Option.builder("p").build(), Option.builder("f").build()};
         when(commandLineParser.parse(any(Options.class), any(String[].class))).thenReturn(commandLine);
         when(commandLine.getOptions()).thenReturn(optionList);
         when(commandLine.hasOption(ODriveCmdRunner.OPTION_PROPERTIES)).thenReturn(true);
@@ -466,9 +471,9 @@ public class ODriveCmdRunnerTest {
         String optionDirectory = "test-directory";
         List<String> optionFiles = List.of(optionFile);
         String[] args = {"arg1", "arg2"};
-        Option[] optionList = {mock(Option.class), mock(Option.class)};
-        DriveItem file1 = mock(DriveItem.class);
-        DriveItem file2 = mock(DriveItem.class);
+        Option[] optionList = {Option.builder("p").build(), Option.builder("f").build()};
+        DriveItem file1 = driveItem("file1.txt", "etag1");
+        DriveItem file2 = driveItem("file2.txt", "etag2");
         List<DriveItem> files = Arrays.asList(file1, file2);
         when(commandLineParser.parse(any(Options.class), any(String[].class))).thenReturn(commandLine);
         when(commandLine.getOptions()).thenReturn(optionList);
@@ -500,17 +505,12 @@ public class ODriveCmdRunnerTest {
         verify(commandLine).getOptionValue(ODriveCmdRunner.OPTION_DIRECTORY);
         verify(propertiesODriveCredential).setPropertyFile(propertiesValue);
         verify(fileService).uploadFiles(optionFiles, optionDirectory);
-        verify(file1).name();
-        verify(file1).eTag();
-        verify(file2).name();
-        verify(file2).eTag();
 
         verifyNoMoreInteractions(commandLineParser);
         verifyNoMoreInteractions(helpFormatter);
         verifyNoMoreInteractions(oDriveSetting);
         verifyNoMoreInteractions(commandLine);
         verifyNoMoreInteractions(propertiesODriveCredential);
-        verifyNoMoreInteractions(file1, file2);
         verifyNoMoreInteractions(fileService);
 
         verifyNoInteractions(options);
