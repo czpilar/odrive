@@ -3,82 +3,19 @@ package net.czpilar.odrive.core.model;
 /**
  * Model representing a OneDrive drive item (file or folder).
  *
+ * @param id              item ID
+ * @param name            item name
+ * @param size            item size in bytes
+ * @param eTag            item eTag
+ * @param folder          folder facet (non-null if item is a folder)
+ * @param file            file facet (non-null if item is a file)
+ * @param parentReference parent reference
+ * @param fileSystemInfo  file system info
  * @author David Pilar (david@czpilar.net)
  */
-public class DriveItem {
-
-    private String id;
-    private String name;
-    private Long size;
-    private String eTag;
-    private Object folder;
-    private Object file;
-    private ParentReference parentReference;
-    private FileSystemInfo fileSystemInfo;
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Long getSize() {
-        return size;
-    }
-
-    public void setSize(Long size) {
-        this.size = size;
-    }
-
-    public String getETag() {
-        return eTag;
-    }
-
-    public void setETag(String eTag) {
-        this.eTag = eTag;
-    }
-
-    public Object getFolder() {
-        return folder;
-    }
-
-    public void setFolder(Object folder) {
-        this.folder = folder;
-    }
-
-    public Object getFile() {
-        return file;
-    }
-
-    public void setFile(Object file) {
-        this.file = file;
-    }
-
-    public ParentReference getParentReference() {
-        return parentReference;
-    }
-
-    public void setParentReference(ParentReference parentReference) {
-        this.parentReference = parentReference;
-    }
-
-    public FileSystemInfo getFileSystemInfo() {
-        return fileSystemInfo;
-    }
-
-    public void setFileSystemInfo(FileSystemInfo fileSystemInfo) {
-        this.fileSystemInfo = fileSystemInfo;
-    }
+public record DriveItem(String id, String name, Long size, String eTag,
+                        Object folder, Object file,
+                        ParentReference parentReference, FileSystemInfo fileSystemInfo) {
 
     public boolean isFolder() {
         return folder != null;
@@ -95,8 +32,8 @@ public class DriveItem {
      */
     public String getPathDisplay() {
         String parentPath = "";
-        if (parentReference != null && parentReference.getPath() != null) {
-            String refPath = parentReference.getPath();
+        if (parentReference != null && parentReference.path() != null) {
+            String refPath = parentReference.path();
             int idx = refPath.indexOf(":");
             if (idx >= 0) {
                 parentPath = refPath.substring(idx + 1);

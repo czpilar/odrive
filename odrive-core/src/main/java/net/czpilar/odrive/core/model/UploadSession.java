@@ -3,26 +3,9 @@ package net.czpilar.odrive.core.model;
 /**
  * Model representing an upload session for large file uploads.
  *
+ * @param uploadUrl          upload URL for uploading chunks
+ * @param expirationDateTime expiration date time of the upload session
  * @author David Pilar (david@czpilar.net)
  */
-public class UploadSession {
-
-    private String uploadUrl;
-    private String expirationDateTime;
-
-    public String getUploadUrl() {
-        return uploadUrl;
-    }
-
-    public void setUploadUrl(String uploadUrl) {
-        this.uploadUrl = uploadUrl;
-    }
-
-    public String getExpirationDateTime() {
-        return expirationDateTime;
-    }
-
-    public void setExpirationDateTime(String expirationDateTime) {
-        this.expirationDateTime = expirationDateTime;
-    }
+public record UploadSession(String uploadUrl, String expirationDateTime) {
 }

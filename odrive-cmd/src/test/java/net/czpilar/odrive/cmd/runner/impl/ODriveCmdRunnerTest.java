@@ -500,10 +500,10 @@ public class ODriveCmdRunnerTest {
         verify(commandLine).getOptionValue(ODriveCmdRunner.OPTION_DIRECTORY);
         verify(propertiesODriveCredential).setPropertyFile(propertiesValue);
         verify(fileService).uploadFiles(optionFiles, optionDirectory);
-        verify(file1).getName();
-        verify(file1).getETag();
-        verify(file2).getName();
-        verify(file2).getETag();
+        verify(file1).name();
+        verify(file1).eTag();
+        verify(file2).name();
+        verify(file2).eTag();
 
         verifyNoMoreInteractions(commandLineParser);
         verifyNoMoreInteractions(helpFormatter);

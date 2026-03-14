@@ -82,9 +82,9 @@ public class EqualUtilsTest {
         FileSystemInfo fsi = mock(FileSystemInfo.class);
         long lastModified = path.toFile().lastModified();
         String isoTime = Instant.ofEpochMilli(lastModified - 2000).atOffset(ZoneOffset.UTC).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
-        when(item.getSize()).thenReturn(path.toFile().length());
-        when(item.getFileSystemInfo()).thenReturn(fsi);
-        when(fsi.getLastModifiedDateTime()).thenReturn(isoTime);
+        when(item.size()).thenReturn(path.toFile().length());
+        when(item.fileSystemInfo()).thenReturn(fsi);
+        when(fsi.lastModifiedDateTime()).thenReturn(isoTime);
 
         boolean result = EqualUtils.equals(item, path);
 
@@ -98,9 +98,9 @@ public class EqualUtilsTest {
         FileSystemInfo fsi = mock(FileSystemInfo.class);
         long lastModified = path.toFile().lastModified();
         String isoTime = Instant.ofEpochMilli(lastModified).atOffset(ZoneOffset.UTC).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
-        when(item.getSize()).thenReturn(path.toFile().length() + 1);
-        when(item.getFileSystemInfo()).thenReturn(fsi);
-        when(fsi.getLastModifiedDateTime()).thenReturn(isoTime);
+        when(item.size()).thenReturn(path.toFile().length() + 1);
+        when(item.fileSystemInfo()).thenReturn(fsi);
+        when(fsi.lastModifiedDateTime()).thenReturn(isoTime);
 
         boolean result = EqualUtils.equals(item, path);
 
@@ -114,9 +114,9 @@ public class EqualUtilsTest {
         FileSystemInfo fsi = mock(FileSystemInfo.class);
         long lastModified = path.toFile().lastModified();
         String isoTime = Instant.ofEpochMilli(lastModified).atOffset(ZoneOffset.UTC).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
-        when(item.getSize()).thenReturn(path.toFile().length());
-        when(item.getFileSystemInfo()).thenReturn(fsi);
-        when(fsi.getLastModifiedDateTime()).thenReturn(isoTime);
+        when(item.size()).thenReturn(path.toFile().length());
+        when(item.fileSystemInfo()).thenReturn(fsi);
+        when(fsi.lastModifiedDateTime()).thenReturn(isoTime);
 
         boolean result = EqualUtils.equals(item, path);
 
@@ -130,9 +130,9 @@ public class EqualUtilsTest {
         FileSystemInfo fsi = mock(FileSystemInfo.class);
         long lastModified = path.toFile().lastModified();
         String isoTime = Instant.ofEpochMilli(lastModified + 2000).atOffset(ZoneOffset.UTC).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
-        when(item.getSize()).thenReturn(path.toFile().length());
-        when(item.getFileSystemInfo()).thenReturn(fsi);
-        when(fsi.getLastModifiedDateTime()).thenReturn(isoTime);
+        when(item.size()).thenReturn(path.toFile().length());
+        when(item.fileSystemInfo()).thenReturn(fsi);
+        when(fsi.lastModifiedDateTime()).thenReturn(isoTime);
 
         boolean result = EqualUtils.equals(item, path);
 

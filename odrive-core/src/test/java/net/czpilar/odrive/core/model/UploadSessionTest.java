@@ -7,36 +7,35 @@ import static org.junit.jupiter.api.Assertions.*;
 public class UploadSessionTest {
 
     @Test
-    public void testDefaultValues() {
-        UploadSession session = new UploadSession();
+    public void testRecordAccessors() {
+        UploadSession session = new UploadSession("https://upload.example.com/session123", "2026-03-15T12:00:00Z");
 
-        assertNull(session.getUploadUrl());
-        assertNull(session.getExpirationDateTime());
+        assertEquals("https://upload.example.com/session123", session.uploadUrl());
+        assertEquals("2026-03-15T12:00:00Z", session.expirationDateTime());
     }
 
     @Test
-    public void testSetAndGetUploadUrl() {
-        UploadSession session = new UploadSession();
-        session.setUploadUrl("https://upload.example.com/session123");
+    public void testNullValues() {
+        UploadSession session = new UploadSession(null, null);
 
-        assertEquals("https://upload.example.com/session123", session.getUploadUrl());
+        assertNull(session.uploadUrl());
+        assertNull(session.expirationDateTime());
     }
 
     @Test
-    public void testSetAndGetExpirationDateTime() {
-        UploadSession session = new UploadSession();
-        session.setExpirationDateTime("2026-03-15T12:00:00Z");
+    public void testEquality() {
+        UploadSession session1 = new UploadSession("url", "expiry");
+        UploadSession session2 = new UploadSession("url", "expiry");
 
-        assertEquals("2026-03-15T12:00:00Z", session.getExpirationDateTime());
+        assertEquals(session1, session2);
+        assertEquals(session1.hashCode(), session2.hashCode());
     }
 
     @Test
-    public void testSetAllFields() {
-        UploadSession session = new UploadSession();
-        session.setUploadUrl("https://upload.example.com/session");
-        session.setExpirationDateTime("2026-03-15T12:00:00Z");
+    public void testInequality() {
+        UploadSession session1 = new UploadSession("url1", "expiry1");
+        UploadSession session2 = new UploadSession("url2", "expiry2");
 
-        assertEquals("https://upload.example.com/session", session.getUploadUrl());
-        assertEquals("2026-03-15T12:00:00Z", session.getExpirationDateTime());
+        assertNotEquals(session1, session2);
     }
 }

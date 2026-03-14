@@ -38,12 +38,19 @@ public class OneDriveClientTest {
         client = new OneDriveClient(restTemplate, ACCESS_TOKEN);
     }
 
+    private static DriveItem driveItem(String id) {
+        return new DriveItem(id, null, null, null, null, null, null, null);
+    }
+
+    private static DriveItem emptyDriveItem() {
+        return new DriveItem(null, null, null, null, null, null, null, null);
+    }
+
     // --- getItemByPath ---
 
     @Test
     public void testGetItemByPath() {
-        DriveItem item = new DriveItem();
-        item.setId("item-id");
+        DriveItem item = driveItem("item-id");
         ResponseEntity<DriveItem> response = new ResponseEntity<>(item, HttpStatus.OK);
 
         when(restTemplate.exchange(anyString(), eq(HttpMethod.GET), any(HttpEntity.class), eq(DriveItem.class)))
@@ -52,7 +59,7 @@ public class OneDriveClientTest {
         DriveItem result = client.getItemByPath("Documents/myfile.txt");
 
         assertNotNull(result);
-        assertEquals("item-id", result.getId());
+        assertEquals("item-id", result.id());
 
         ArgumentCaptor<String> urlCaptor = ArgumentCaptor.forClass(String.class);
         verify(restTemplate).exchange(urlCaptor.capture(), eq(HttpMethod.GET), any(HttpEntity.class), eq(DriveItem.class));
@@ -79,7 +86,7 @@ public class OneDriveClientTest {
 
     @Test
     public void testGetItemByPathWithLeadingSlash() {
-        ResponseEntity<DriveItem> response = new ResponseEntity<>(new DriveItem(), HttpStatus.OK);
+        ResponseEntity<DriveItem> response = new ResponseEntity<>(emptyDriveItem(), HttpStatus.OK);
         when(restTemplate.exchange(anyString(), eq(HttpMethod.GET), any(HttpEntity.class), eq(DriveItem.class)))
                 .thenReturn(response);
 
@@ -92,7 +99,7 @@ public class OneDriveClientTest {
 
     @Test
     public void testGetItemByPathWithSpacesInPath() {
-        ResponseEntity<DriveItem> response = new ResponseEntity<>(new DriveItem(), HttpStatus.OK);
+        ResponseEntity<DriveItem> response = new ResponseEntity<>(emptyDriveItem(), HttpStatus.OK);
         when(restTemplate.exchange(anyString(), eq(HttpMethod.GET), any(HttpEntity.class), eq(DriveItem.class)))
                 .thenReturn(response);
 
@@ -107,8 +114,7 @@ public class OneDriveClientTest {
 
     @Test
     public void testCreateFolderAtRoot() {
-        DriveItem folder = new DriveItem();
-        folder.setId("folder-id");
+        DriveItem folder = driveItem("folder-id");
         ResponseEntity<DriveItem> response = new ResponseEntity<>(folder, HttpStatus.CREATED);
 
         when(restTemplate.exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class), eq(DriveItem.class)))
@@ -117,7 +123,7 @@ public class OneDriveClientTest {
         DriveItem result = client.createFolderAtRoot("TestFolder");
 
         assertNotNull(result);
-        assertEquals("folder-id", result.getId());
+        assertEquals("folder-id", result.id());
 
         ArgumentCaptor<String> urlCaptor = ArgumentCaptor.forClass(String.class);
         verify(restTemplate).exchange(urlCaptor.capture(), eq(HttpMethod.POST), any(HttpEntity.class), eq(DriveItem.class));
@@ -136,8 +142,7 @@ public class OneDriveClientTest {
 
     @Test
     public void testCreateFolder() {
-        DriveItem folder = new DriveItem();
-        folder.setId("subfolder-id");
+        DriveItem folder = driveItem("subfolder-id");
         ResponseEntity<DriveItem> response = new ResponseEntity<>(folder, HttpStatus.CREATED);
 
         when(restTemplate.exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class), eq(DriveItem.class)))
@@ -146,7 +151,7 @@ public class OneDriveClientTest {
         DriveItem result = client.createFolder("parent-id", "SubFolder");
 
         assertNotNull(result);
-        assertEquals("subfolder-id", result.getId());
+        assertEquals("subfolder-id", result.id());
 
         ArgumentCaptor<String> urlCaptor = ArgumentCaptor.forClass(String.class);
         verify(restTemplate).exchange(urlCaptor.capture(), eq(HttpMethod.POST), any(HttpEntity.class), eq(DriveItem.class));
@@ -168,8 +173,7 @@ public class OneDriveClientTest {
         File localFile = tempDir.resolve("test.txt").toFile();
         Files.writeString(localFile.toPath(), "test content");
 
-        DriveItem uploadedItem = new DriveItem();
-        uploadedItem.setId("uploaded-id");
+        DriveItem uploadedItem = driveItem("uploaded-id");
         ResponseEntity<DriveItem> response = new ResponseEntity<>(uploadedItem, HttpStatus.CREATED);
 
         when(restTemplate.exchange(anyString(), eq(HttpMethod.PUT), any(HttpEntity.class), eq(DriveItem.class)))
@@ -178,7 +182,7 @@ public class OneDriveClientTest {
         DriveItem result = client.uploadSmallFile("Documents/test.txt", localFile);
 
         assertNotNull(result);
-        assertEquals("uploaded-id", result.getId());
+        assertEquals("uploaded-id", result.id());
 
         ArgumentCaptor<String> urlCaptor = ArgumentCaptor.forClass(String.class);
         verify(restTemplate).exchange(urlCaptor.capture(), eq(HttpMethod.PUT), any(HttpEntity.class), eq(DriveItem.class));
@@ -209,8 +213,7 @@ public class OneDriveClientTest {
 
     @Test
     public void testCreateUploadSession() {
-        UploadSession session = new UploadSession();
-        session.setUploadUrl("https://upload.example.com/session123");
+        UploadSession session = new UploadSession("https://upload.example.com/session123", null);
         ResponseEntity<UploadSession> response = new ResponseEntity<>(session, HttpStatus.OK);
 
         when(restTemplate.exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class), eq(UploadSession.class)))
@@ -219,7 +222,7 @@ public class OneDriveClientTest {
         UploadSession result = client.createUploadSession("Documents/large-file.zip");
 
         assertNotNull(result);
-        assertEquals("https://upload.example.com/session123", result.getUploadUrl());
+        assertEquals("https://upload.example.com/session123", result.uploadUrl());
 
         ArgumentCaptor<String> urlCaptor = ArgumentCaptor.forClass(String.class);
         verify(restTemplate).exchange(urlCaptor.capture(), eq(HttpMethod.POST), any(HttpEntity.class), eq(UploadSession.class));
@@ -239,8 +242,7 @@ public class OneDriveClientTest {
 
     @Test
     public void testUploadChunkComplete() {
-        DriveItem item = new DriveItem();
-        item.setId("completed-id");
+        DriveItem item = driveItem("completed-id");
         ResponseEntity<DriveItem> response = new ResponseEntity<>(item, HttpStatus.OK);
 
         when(restTemplate.exchange(anyString(), eq(HttpMethod.PUT), any(HttpEntity.class), eq(DriveItem.class)))
@@ -250,13 +252,12 @@ public class OneDriveClientTest {
         DriveItem result = client.uploadChunk("https://upload.example.com/session", data, 0, 9, 100);
 
         assertNotNull(result);
-        assertEquals("completed-id", result.getId());
+        assertEquals("completed-id", result.id());
     }
 
     @Test
     public void testUploadChunkCreated() {
-        DriveItem item = new DriveItem();
-        item.setId("created-id");
+        DriveItem item = driveItem("created-id");
         ResponseEntity<DriveItem> response = new ResponseEntity<>(item, HttpStatus.CREATED);
 
         when(restTemplate.exchange(anyString(), eq(HttpMethod.PUT), any(HttpEntity.class), eq(DriveItem.class)))
@@ -266,7 +267,7 @@ public class OneDriveClientTest {
         DriveItem result = client.uploadChunk("https://upload.example.com/session", data, 90, 99, 100);
 
         assertNotNull(result);
-        assertEquals("created-id", result.getId());
+        assertEquals("created-id", result.id());
     }
 
     @Test
@@ -313,7 +314,7 @@ public class OneDriveClientTest {
 
     @Test
     public void testAuthorizationHeaderIsSet() {
-        ResponseEntity<DriveItem> response = new ResponseEntity<>(new DriveItem(), HttpStatus.OK);
+        ResponseEntity<DriveItem> response = new ResponseEntity<>(emptyDriveItem(), HttpStatus.OK);
         when(restTemplate.exchange(anyString(), eq(HttpMethod.GET), any(HttpEntity.class), eq(DriveItem.class)))
                 .thenReturn(response);
 

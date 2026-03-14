@@ -8,140 +8,111 @@ public class DriveItemTest {
 
     @Test
     public void testIsFolderWhenFolderIsNotNull() {
-        DriveItem item = new DriveItem();
-        item.setFolder(new Object());
+        DriveItem item = new DriveItem(null, null, null, null, new Object(), null, null, null);
 
         assertTrue(item.isFolder());
     }
 
     @Test
     public void testIsFolderWhenFolderIsNull() {
-        DriveItem item = new DriveItem();
+        DriveItem item = new DriveItem(null, null, null, null, null, null, null, null);
 
         assertFalse(item.isFolder());
     }
 
     @Test
     public void testIsFileWhenFileIsNotNull() {
-        DriveItem item = new DriveItem();
-        item.setFile(new Object());
+        DriveItem item = new DriveItem(null, null, null, null, null, new Object(), null, null);
 
         assertTrue(item.isFile());
     }
 
     @Test
     public void testIsFileWhenFileIsNull() {
-        DriveItem item = new DriveItem();
+        DriveItem item = new DriveItem(null, null, null, null, null, null, null, null);
 
         assertFalse(item.isFile());
     }
 
     @Test
     public void testGetPathDisplayWithParentPathAndName() {
-        DriveItem item = new DriveItem();
-        item.setName("myfile.txt");
-        ParentReference ref = new ParentReference();
-        ref.setPath("/drive/root:/Documents/Subfolder");
-        item.setParentReference(ref);
+        ParentReference ref = new ParentReference(null, "/drive/root:/Documents/Subfolder");
+        DriveItem item = new DriveItem(null, "myfile.txt", null, null, null, null, ref, null);
 
         assertEquals("/Documents/Subfolder/myfile.txt", item.getPathDisplay());
     }
 
     @Test
     public void testGetPathDisplayWithRootParentPath() {
-        DriveItem item = new DriveItem();
-        item.setName("myfile.txt");
-        ParentReference ref = new ParentReference();
-        ref.setPath("/drive/root:");
-        item.setParentReference(ref);
+        ParentReference ref = new ParentReference(null, "/drive/root:");
+        DriveItem item = new DriveItem(null, "myfile.txt", null, null, null, null, ref, null);
 
         assertEquals("/myfile.txt", item.getPathDisplay());
     }
 
     @Test
     public void testGetPathDisplayWithSlashAfterColon() {
-        DriveItem item = new DriveItem();
-        item.setName("myfile.txt");
-        ParentReference ref = new ParentReference();
-        ref.setPath("/drive/root:/");
-        item.setParentReference(ref);
+        ParentReference ref = new ParentReference(null, "/drive/root:/");
+        DriveItem item = new DriveItem(null, "myfile.txt", null, null, null, null, ref, null);
 
         assertEquals("/myfile.txt", item.getPathDisplay());
     }
 
     @Test
     public void testGetPathDisplayWithNullName() {
-        DriveItem item = new DriveItem();
-        ParentReference ref = new ParentReference();
-        ref.setPath("/drive/root:/Documents");
-        item.setParentReference(ref);
+        ParentReference ref = new ParentReference(null, "/drive/root:/Documents");
+        DriveItem item = new DriveItem(null, null, null, null, null, null, ref, null);
 
         assertEquals("/Documents", item.getPathDisplay());
     }
 
     @Test
     public void testGetPathDisplayWithNullParentReference() {
-        DriveItem item = new DriveItem();
-        item.setName("myfile.txt");
+        DriveItem item = new DriveItem(null, "myfile.txt", null, null, null, null, null, null);
 
         assertEquals("/myfile.txt", item.getPathDisplay());
     }
 
     @Test
     public void testGetPathDisplayWithNullParentPath() {
-        DriveItem item = new DriveItem();
-        item.setName("myfile.txt");
-        ParentReference ref = new ParentReference();
-        item.setParentReference(ref);
+        ParentReference ref = new ParentReference(null, null);
+        DriveItem item = new DriveItem(null, "myfile.txt", null, null, null, null, ref, null);
 
         assertEquals("/myfile.txt", item.getPathDisplay());
     }
 
     @Test
     public void testGetPathDisplayWithNullParentReferenceAndNullName() {
-        DriveItem item = new DriveItem();
+        DriveItem item = new DriveItem(null, null, null, null, null, null, null, null);
 
         assertEquals("", item.getPathDisplay());
     }
 
     @Test
     public void testGetPathDisplayWithPathNotContainingColon() {
-        DriveItem item = new DriveItem();
-        item.setName("myfile.txt");
-        ParentReference ref = new ParentReference();
-        ref.setPath("no-colon-path");
-        item.setParentReference(ref);
+        ParentReference ref = new ParentReference(null, "no-colon-path");
+        DriveItem item = new DriveItem(null, "myfile.txt", null, null, null, null, ref, null);
 
         // No colon found, parentPath stays empty
         assertEquals("/myfile.txt", item.getPathDisplay());
     }
 
     @Test
-    public void testGettersAndSetters() {
-        DriveItem item = new DriveItem();
-        item.setId("test-id");
-        item.setName("test-name");
-        item.setSize(1024L);
-        item.setETag("test-etag");
-
+    public void testRecordAccessors() {
         Object folder = new Object();
-        item.setFolder(folder);
         Object file = new Object();
-        item.setFile(file);
+        ParentReference ref = new ParentReference("ref-id", "/path");
+        FileSystemInfo fsi = new FileSystemInfo("2026-03-14T12:00:00Z");
 
-        ParentReference ref = new ParentReference();
-        item.setParentReference(ref);
+        DriveItem item = new DriveItem("test-id", "test-name", 1024L, "test-etag", folder, file, ref, fsi);
 
-        FileSystemInfo fsi = new FileSystemInfo();
-        item.setFileSystemInfo(fsi);
-
-        assertEquals("test-id", item.getId());
-        assertEquals("test-name", item.getName());
-        assertEquals(1024L, item.getSize());
-        assertEquals("test-etag", item.getETag());
-        assertSame(folder, item.getFolder());
-        assertSame(file, item.getFile());
-        assertSame(ref, item.getParentReference());
-        assertSame(fsi, item.getFileSystemInfo());
+        assertEquals("test-id", item.id());
+        assertEquals("test-name", item.name());
+        assertEquals(1024L, item.size());
+        assertEquals("test-etag", item.eTag());
+        assertSame(folder, item.folder());
+        assertSame(file, item.file());
+        assertSame(ref, item.parentReference());
+        assertSame(fsi, item.fileSystemInfo());
     }
 }

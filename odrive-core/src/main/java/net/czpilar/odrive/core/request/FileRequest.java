@@ -64,7 +64,7 @@ public class FileRequest {
 
     private DriveItem executeChunkedUpload(long size) throws IOException {
         UploadSession session = client.createUploadSession(remoteFilePath);
-        if (session == null || session.getUploadUrl() == null) {
+        if (session == null || session.uploadUrl() == null) {
             throw new ODriveException("Failed to create upload session.");
         }
 
@@ -80,7 +80,7 @@ public class FileRequest {
                 }
 
                 DriveItem result = uploadChunkWithRetries(
-                        session.getUploadUrl(), buffer, offsetBytes,
+                        session.uploadUrl(), buffer, offsetBytes,
                         offsetBytes + bytesRead - 1, size);
 
                 offsetBytes += bytesRead;

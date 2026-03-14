@@ -139,7 +139,7 @@ public class ODriveCmdRunner implements IODriveCmdRunner {
             List<DriveItem> files = fileService.uploadFiles(Arrays.asList(cmd.getOptionValues(OPTION_FILE)), dir);
             System.out.println("Uploaded " + files.size() + " file(s)...");
             for (DriveItem file : files) {
-                System.out.println("- " + file.getName() + " (remote eTag: " + file.getETag() + ")");
+                System.out.println("- " + file.name() + " (remote eTag: " + file.eTag() + ")");
             }
         }
     }

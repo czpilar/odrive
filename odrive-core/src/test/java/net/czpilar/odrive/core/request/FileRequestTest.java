@@ -33,6 +33,14 @@ public class FileRequestTest {
         MockitoAnnotations.openMocks(this);
     }
 
+    private static DriveItem driveItem(String id) {
+        return new DriveItem(id, null, null, null, null, null, null, null);
+    }
+
+    private static DriveItem emptyDriveItem() {
+        return new DriveItem(null, null, null, null, null, null, null, null);
+    }
+
     // --- Small file upload ---
 
     @Test
@@ -40,8 +48,7 @@ public class FileRequestTest {
         File localFile = tempDir.resolve("small.txt").toFile();
         Files.writeString(localFile.toPath(), "small file content");
 
-        DriveItem uploadedItem = new DriveItem();
-        uploadedItem.setId("small-file-id");
+        DriveItem uploadedItem = driveItem("small-file-id");
         when(client.uploadSmallFile(anyString(), any(File.class))).thenReturn(uploadedItem);
 
         FileRequest request = FileRequest.create(client, "remote/small.txt", localFile);
@@ -50,7 +57,7 @@ public class FileRequestTest {
         DriveItem result = request.execute();
 
         assertNotNull(result);
-        assertEquals("small-file-id", result.getId());
+        assertEquals("small-file-id", result.id());
 
         verify(client).uploadSmallFile("remote/small.txt", localFile);
         verify(progressListener).progressChanged(IFileUploadProgressListener.State.INITIATION, 0);
@@ -63,7 +70,7 @@ public class FileRequestTest {
         File localFile = tempDir.resolve("small.txt").toFile();
         Files.writeString(localFile.toPath(), "small file content");
 
-        DriveItem uploadedItem = new DriveItem();
+        DriveItem uploadedItem = emptyDriveItem();
         when(client.uploadSmallFile(anyString(), any(File.class))).thenReturn(uploadedItem);
 
         FileRequest request = FileRequest.create(client, "remote/small.txt", localFile);
@@ -83,13 +90,11 @@ public class FileRequestTest {
         byte[] content = new byte[FileRequest.SMALL_FILE_LIMIT + 1024];
         Files.write(localFile.toPath(), content);
 
-        UploadSession session = new UploadSession();
-        session.setUploadUrl("https://upload.example.com/session");
+        UploadSession session = new UploadSession("https://upload.example.com/session", null);
         when(client.createUploadSession("remote/large.bin")).thenReturn(session);
 
         // First chunks return null (202 Accepted), last chunk returns DriveItem
-        DriveItem completedItem = new DriveItem();
-        completedItem.setId("large-file-id");
+        DriveItem completedItem = driveItem("large-file-id");
         when(client.uploadChunk(anyString(), any(byte[].class), anyLong(), anyLong(), anyLong()))
                 .thenReturn(null)   // first chunk
                 .thenReturn(null)   // second chunk
@@ -101,7 +106,7 @@ public class FileRequestTest {
         DriveItem result = request.execute();
 
         assertNotNull(result);
-        assertEquals("large-file-id", result.getId());
+        assertEquals("large-file-id", result.id());
 
         verify(client).createUploadSession("remote/large.bin");
         verify(client, atLeastOnce()).uploadChunk(eq("https://upload.example.com/session"),
@@ -130,8 +135,7 @@ public class FileRequestTest {
         byte[] content = new byte[FileRequest.SMALL_FILE_LIMIT + 1024];
         Files.write(localFile.toPath(), content);
 
-        UploadSession session = new UploadSession();
-        session.setUploadUrl(null);
+        UploadSession session = new UploadSession(null, null);
         when(client.createUploadSession("remote/large.bin")).thenReturn(session);
 
         FileRequest request = FileRequest.create(client, "remote/large.bin", localFile);
@@ -147,12 +151,10 @@ public class FileRequestTest {
         byte[] content = new byte[FileRequest.SMALL_FILE_LIMIT + 100];
         Files.write(localFile.toPath(), content);
 
-        UploadSession session = new UploadSession();
-        session.setUploadUrl("https://upload.example.com/session");
+        UploadSession session = new UploadSession("https://upload.example.com/session", null);
         when(client.createUploadSession("remote/large.bin")).thenReturn(session);
 
-        DriveItem completedItem = new DriveItem();
-        completedItem.setId("retry-success-id");
+        DriveItem completedItem = driveItem("retry-success-id");
 
         // First call fails, second succeeds
         when(client.uploadChunk(anyString(), any(byte[].class), anyLong(), anyLong(), anyLong()))
@@ -163,7 +165,7 @@ public class FileRequestTest {
         DriveItem result = request.execute();
 
         assertNotNull(result);
-        assertEquals("retry-success-id", result.getId());
+        assertEquals("retry-success-id", result.id());
         verify(client, times(2)).uploadChunk(anyString(), any(byte[].class), anyLong(), anyLong(), anyLong());
     }
 
@@ -173,8 +175,7 @@ public class FileRequestTest {
         byte[] content = new byte[FileRequest.SMALL_FILE_LIMIT + 100];
         Files.write(localFile.toPath(), content);
 
-        UploadSession session = new UploadSession();
-        session.setUploadUrl("https://upload.example.com/session");
+        UploadSession session = new UploadSession("https://upload.example.com/session", null);
         when(client.createUploadSession("remote/large.bin")).thenReturn(session);
 
         when(client.uploadChunk(anyString(), any(byte[].class), anyLong(), anyLong(), anyLong()))

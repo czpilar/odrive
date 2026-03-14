@@ -7,36 +7,35 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ParentReferenceTest {
 
     @Test
-    public void testDefaultValues() {
-        ParentReference ref = new ParentReference();
+    public void testRecordAccessors() {
+        ParentReference ref = new ParentReference("parent-id-123", "/drive/root:/Documents");
 
-        assertNull(ref.getId());
-        assertNull(ref.getPath());
+        assertEquals("parent-id-123", ref.id());
+        assertEquals("/drive/root:/Documents", ref.path());
     }
 
     @Test
-    public void testSetAndGetId() {
-        ParentReference ref = new ParentReference();
-        ref.setId("parent-id-123");
+    public void testNullValues() {
+        ParentReference ref = new ParentReference(null, null);
 
-        assertEquals("parent-id-123", ref.getId());
+        assertNull(ref.id());
+        assertNull(ref.path());
     }
 
     @Test
-    public void testSetAndGetPath() {
-        ParentReference ref = new ParentReference();
-        ref.setPath("/drive/root:/Documents");
+    public void testEquality() {
+        ParentReference ref1 = new ParentReference("id", "/path");
+        ParentReference ref2 = new ParentReference("id", "/path");
 
-        assertEquals("/drive/root:/Documents", ref.getPath());
+        assertEquals(ref1, ref2);
+        assertEquals(ref1.hashCode(), ref2.hashCode());
     }
 
     @Test
-    public void testSetAllFields() {
-        ParentReference ref = new ParentReference();
-        ref.setId("test-id");
-        ref.setPath("/drive/root:/folder");
+    public void testInequality() {
+        ParentReference ref1 = new ParentReference("id1", "/path1");
+        ParentReference ref2 = new ParentReference("id2", "/path2");
 
-        assertEquals("test-id", ref.getId());
-        assertEquals("/drive/root:/folder", ref.getPath());
+        assertNotEquals(ref1, ref2);
     }
 }

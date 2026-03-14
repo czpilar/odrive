@@ -110,7 +110,7 @@ public class FileService extends AbstractFileService implements IFileService {
                 LOG.info("There is nothing to upload.");
             }
 
-            LOG.info("Finished uploading file {} - remote eTag is {}", filename, currentFile.getETag());
+            LOG.info("Finished uploading file {} - remote eTag is {}", filename, currentFile.eTag());
             return currentFile;
         } catch (Exception e) {
             LOG.error("Unable to upload file {}.", filename);

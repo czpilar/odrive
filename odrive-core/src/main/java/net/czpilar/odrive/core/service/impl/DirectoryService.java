@@ -39,7 +39,7 @@ public class DirectoryService extends AbstractFileService implements IDirectoryS
             if (parentDir == null) {
                 return getOneDriveClient().createFolderAtRoot(dirname);
             }
-            return getOneDriveClient().createFolder(parentDir.getId(), dirname);
+            return getOneDriveClient().createFolder(parentDir.id(), dirname);
         } catch (OneDriveClient.OneDriveClientException e) {
             LOG.error("Unable to create directory {}.", dirname);
             throw new DirectoryHandleException("Unable to create directory.", e);

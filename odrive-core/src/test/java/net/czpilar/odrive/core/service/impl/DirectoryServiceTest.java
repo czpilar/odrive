@@ -66,7 +66,7 @@ public class DirectoryServiceTest {
 
         when(serviceMock.createOneDirectory(anyString(), any(DriveItem.class))).thenCallRealMethod();
         when(oneDriveClient.createFolder("test-parent-dir-id", dirname)).thenReturn(directory);
-        when(parentDir.getId()).thenReturn("test-parent-dir-id");
+        when(parentDir.id()).thenReturn("test-parent-dir-id");
 
         DriveItem result = serviceMock.createOneDirectory(dirname, parentDir);
 
@@ -76,7 +76,7 @@ public class DirectoryServiceTest {
         verify(serviceMock).createOneDirectory(dirname, parentDir);
         verify(serviceMock).getOneDriveClient();
         verify(oneDriveClient).createFolder("test-parent-dir-id", dirname);
-        verify(parentDir).getId();
+        verify(parentDir).id();
 
         verifyNoMoreInteractions(serviceMock);
         verifyNoMoreInteractions(oneDriveClient);

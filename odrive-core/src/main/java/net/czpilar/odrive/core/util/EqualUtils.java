@@ -25,8 +25,8 @@ public class EqualUtils {
         if (remoteFile != null && pathToFile != null) {
             File localFile = pathToFile.toFile();
             if (localFile.exists()) {
-                result = remoteFile.getSize() != null
-                        && remoteFile.getSize() == localFile.length()
+                result = remoteFile.size() != null
+                        && remoteFile.size() == localFile.length()
                         && getRemoteModifiedSeconds(remoteFile) >= toSeconds(localFile.lastModified());
             }
         }
@@ -34,10 +34,10 @@ public class EqualUtils {
     }
 
     private static long getRemoteModifiedSeconds(DriveItem remoteFile) {
-        if (remoteFile.getFileSystemInfo() != null
-                && remoteFile.getFileSystemInfo().getLastModifiedDateTime() != null) {
+        if (remoteFile.fileSystemInfo() != null
+                && remoteFile.fileSystemInfo().lastModifiedDateTime() != null) {
             try {
-                OffsetDateTime dateTime = OffsetDateTime.parse(remoteFile.getFileSystemInfo().getLastModifiedDateTime());
+                OffsetDateTime dateTime = OffsetDateTime.parse(remoteFile.fileSystemInfo().lastModifiedDateTime());
                 return dateTime.toEpochSecond();
             } catch (Exception e) {
                 return 0;
