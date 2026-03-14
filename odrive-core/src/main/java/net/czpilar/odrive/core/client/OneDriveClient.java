@@ -1,7 +1,8 @@
 package net.czpilar.odrive.core.client;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import net.czpilar.odrive.core.model.DriveItem;
 import net.czpilar.odrive.core.model.UploadSession;
 
@@ -14,6 +15,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.Map;
 
 /**
  * HTTP client for Microsoft Graph API OneDrive operations.
@@ -26,12 +28,14 @@ public class OneDriveClient {
 
     private final HttpClient httpClient;
     private final String accessToken;
-    private final Gson gson;
+    private final ObjectMapper objectMapper;
 
     public OneDriveClient(String accessToken) {
         this.accessToken = accessToken;
         this.httpClient = HttpClient.newHttpClient();
-        this.gson = new GsonBuilder().create();
+        this.objectMapper = JsonMapper.builder()
+                .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+                .build();
     }
 
     /**
@@ -49,7 +53,7 @@ public class OneDriveClient {
             return null;
         }
         checkResponse(response);
-        return gson.fromJson(response.body(), DriveItem.class);
+        return fromJson(response.body(), DriveItem.class);
     }
 
     /**
@@ -61,10 +65,10 @@ public class OneDriveClient {
      */
     public DriveItem createFolderAtRoot(String name) {
         String url = GRAPH_BASE_URL + "/me/drive/root/children";
-        String body = gson.toJson(new FolderCreateRequest(name));
+        String body = toJson(Map.of("name", name, "folder", Map.of()));
         HttpResponse<String> response = doPost(url, body, "application/json");
         checkResponse(response);
-        return gson.fromJson(response.body(), DriveItem.class);
+        return fromJson(response.body(), DriveItem.class);
     }
 
     /**
@@ -77,10 +81,10 @@ public class OneDriveClient {
      */
     public DriveItem createFolder(String parentId, String name) {
         String url = GRAPH_BASE_URL + "/me/drive/items/" + parentId + "/children";
-        String body = gson.toJson(new FolderCreateRequest(name));
+        String body = toJson(Map.of("name", name, "folder", Map.of()));
         HttpResponse<String> response = doPost(url, body, "application/json");
         checkResponse(response);
-        return gson.fromJson(response.body(), DriveItem.class);
+        return fromJson(response.body(), DriveItem.class);
     }
 
     /**
@@ -104,7 +108,7 @@ public class OneDriveClient {
                     .build();
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             checkResponse(response);
-            return gson.fromJson(response.body(), DriveItem.class);
+            return fromJson(response.body(), DriveItem.class);
         } catch (IOException | InterruptedException e) {
             throw new OneDriveClientException("Failed to upload file.", e);
         }
@@ -122,7 +126,7 @@ public class OneDriveClient {
         String url = GRAPH_BASE_URL + "/me/drive/root:/" + encodedPath + ":/createUploadSession";
         HttpResponse<String> response = doPost(url, "{}", "application/json");
         checkResponse(response);
-        return gson.fromJson(response.body(), UploadSession.class);
+        return fromJson(response.body(), UploadSession.class);
     }
 
     /**
@@ -146,7 +150,7 @@ public class OneDriveClient {
                     .build();
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             if (response.statusCode() == 200 || response.statusCode() == 201) {
-                return gson.fromJson(response.body(), DriveItem.class);
+                return fromJson(response.body(), DriveItem.class);
             } else if (response.statusCode() == 202) {
                 return null; // more chunks needed
             }
@@ -154,6 +158,22 @@ public class OneDriveClient {
             return null;
         } catch (IOException | InterruptedException e) {
             throw new OneDriveClientException("Failed to upload chunk.", e);
+        }
+    }
+
+    private <T> T fromJson(String json, Class<T> type) {
+        try {
+            return objectMapper.readValue(json, type);
+        } catch (tools.jackson.core.JacksonException e) {
+            throw new OneDriveClientException("Failed to parse JSON response.", e);
+        }
+    }
+
+    private String toJson(Object object) {
+        try {
+            return objectMapper.writeValueAsString(object);
+        } catch (tools.jackson.core.JacksonException e) {
+            throw new OneDriveClientException("Failed to serialize JSON request.", e);
         }
     }
 
@@ -203,23 +223,6 @@ public class OneDriveClient {
             encoded.append(URLEncoder.encode(segments[i], StandardCharsets.UTF_8).replace("+", "%20"));
         }
         return encoded.toString();
-    }
-
-    @SuppressWarnings("unused")
-    private static class FolderCreateRequest {
-        private final String name;
-        private final Object folder = new Object() {};
-        @SuppressWarnings("FieldCanBeLocal")
-        private final ConflictBehavior conflictBehavior;
-
-        FolderCreateRequest(String name) {
-            this.name = name;
-            this.conflictBehavior = null;
-        }
-
-        private enum ConflictBehavior {
-            fail, rename, replace
-        }
     }
 
     public static class OneDriveClientException extends RuntimeException {

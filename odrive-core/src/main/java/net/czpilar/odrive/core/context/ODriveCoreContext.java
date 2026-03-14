@@ -4,12 +4,22 @@ import net.czpilar.odrive.core.client.OneDriveClient;
 import net.czpilar.odrive.core.credential.Credential;
 import net.czpilar.odrive.core.credential.loader.CredentialLoader;
 import net.czpilar.odrive.core.service.IAuthorizationService;
+import net.czpilar.odrive.core.setting.ODriveSetting;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.*;
+import org.springframework.security.oauth2.client.endpoint.OAuth2AccessTokenResponseClient;
+import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCodeGrantRequest;
+import org.springframework.security.oauth2.client.endpoint.OAuth2RefreshTokenGrantRequest;
+import org.springframework.security.oauth2.client.endpoint.RestClientAuthorizationCodeTokenResponseClient;
+import org.springframework.security.oauth2.client.endpoint.RestClientRefreshTokenTokenResponseClient;
+import org.springframework.security.oauth2.client.registration.ClientRegistration;
+import org.springframework.security.oauth2.core.AuthorizationGrantType;
+import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 
 /**
- * Spring configuration for oDrive core providing OneDrive client.
+ * Spring configuration for oDrive core providing OneDrive client
+ * and Spring Security OAuth2 client registration.
  *
  * @author David Pilar (david@czpilar.net)
  */
@@ -26,6 +36,29 @@ public class ODriveCoreContext {
     public ODriveCoreContext(CredentialLoader credentialLoader, IAuthorizationService authorizationService) {
         this.credentialLoader = credentialLoader;
         this.authorizationService = authorizationService;
+    }
+
+    @Bean
+    public ClientRegistration microsoftClientRegistration(ODriveSetting setting) {
+        return ClientRegistration.withRegistrationId("microsoft")
+                .clientId(setting.getClientId())
+                .clientAuthenticationMethod(ClientAuthenticationMethod.NONE)
+                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+                .redirectUri(ODriveSetting.REDIRECT_URI)
+                .scope("Files.ReadWrite", "User.Read", "offline_access")
+                .authorizationUri(setting.getAuthorizationEndpoint())
+                .tokenUri(setting.getTokenEndpoint())
+                .build();
+    }
+
+    @Bean
+    public OAuth2AccessTokenResponseClient<OAuth2AuthorizationCodeGrantRequest> authorizationCodeTokenResponseClient() {
+        return new RestClientAuthorizationCodeTokenResponseClient();
+    }
+
+    @Bean
+    public OAuth2AccessTokenResponseClient<OAuth2RefreshTokenGrantRequest> refreshTokenResponseClient() {
+        return new RestClientRefreshTokenTokenResponseClient();
     }
 
     @Bean

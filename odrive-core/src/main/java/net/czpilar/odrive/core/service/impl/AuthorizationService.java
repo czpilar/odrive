@@ -1,62 +1,97 @@
 package net.czpilar.odrive.core.service.impl;
 
-import com.google.gson.Gson;
 import net.czpilar.odrive.core.credential.Credential;
 import net.czpilar.odrive.core.exception.AuthorizationFailedException;
-import net.czpilar.odrive.core.model.TokenResponse;
 import net.czpilar.odrive.core.service.IAuthorizationService;
 import net.czpilar.odrive.core.setting.ODriveSetting;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.oauth2.client.endpoint.OAuth2AccessTokenResponseClient;
+import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCodeGrantRequest;
+import org.springframework.security.oauth2.client.endpoint.OAuth2RefreshTokenGrantRequest;
+import org.springframework.security.oauth2.client.registration.ClientRegistration;
+import org.springframework.security.oauth2.core.OAuth2AccessToken;
+import org.springframework.security.oauth2.core.OAuth2RefreshToken;
+import org.springframework.security.oauth2.core.endpoint.OAuth2AccessTokenResponse;
+import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationExchange;
+import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
+import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationResponse;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.URLEncoder;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 
 /**
  * Authorization service with methods for authorization to OneDrive
- * using Microsoft OAuth 2.0 authorization code flow.
+ * using Spring Security OAuth2 Client.
  *
  * @author David Pilar (david@czpilar.net)
  */
 @Service
 public class AuthorizationService extends AbstractService implements IAuthorizationService {
 
-    private ODriveSetting oDriveSetting;
+    private static final String CLI_STATE = "odrive-cli";
 
-    private final HttpClient httpClient = HttpClient.newHttpClient();
-    private final Gson gson = new Gson();
+    private ClientRegistration clientRegistration;
+    private ODriveSetting oDriveSetting;
+    private OAuth2AccessTokenResponseClient<OAuth2AuthorizationCodeGrantRequest> authorizationCodeTokenResponseClient;
+    private OAuth2AccessTokenResponseClient<OAuth2RefreshTokenGrantRequest> refreshTokenResponseClient;
+
+    @Autowired
+    public void setClientRegistration(ClientRegistration clientRegistration) {
+        this.clientRegistration = clientRegistration;
+    }
 
     @Autowired
     public void setODriveSetting(ODriveSetting oDriveSetting) {
         this.oDriveSetting = oDriveSetting;
     }
 
+    @Autowired
+    public void setAuthorizationCodeTokenResponseClient(
+            OAuth2AccessTokenResponseClient<OAuth2AuthorizationCodeGrantRequest> authorizationCodeTokenResponseClient) {
+        this.authorizationCodeTokenResponseClient = authorizationCodeTokenResponseClient;
+    }
+
+    @Autowired
+    public void setRefreshTokenResponseClient(
+            OAuth2AccessTokenResponseClient<OAuth2RefreshTokenGrantRequest> refreshTokenResponseClient) {
+        this.refreshTokenResponseClient = refreshTokenResponseClient;
+    }
+
+    private OAuth2AuthorizationRequest buildAuthorizationRequest() {
+        return OAuth2AuthorizationRequest.authorizationCode()
+                .clientId(clientRegistration.getClientId())
+                .authorizationUri(oDriveSetting.getAuthorizationEndpoint())
+                .redirectUri(clientRegistration.getRedirectUri())
+                .scopes(clientRegistration.getScopes())
+                .state(CLI_STATE)
+                .build();
+    }
+
     @Override
     public String getAuthorizationURL() {
-        return oDriveSetting.getAuthorizationEndpoint()
-                + "?client_id=" + encode(oDriveSetting.getClientId())
-                + "&response_type=code"
-                + "&redirect_uri=" + encode(ODriveSetting.REDIRECT_URI)
-                + "&scope=" + encode(ODriveSetting.SCOPES)
-                + "&response_mode=query";
+        return buildAuthorizationRequest().getAuthorizationRequestUri();
     }
 
     @Override
     public Credential authorize(String authorizationCode) {
         try {
-            String body = "client_id=" + encode(oDriveSetting.getClientId())
-                    + "&grant_type=authorization_code"
-                    + "&code=" + encode(authorizationCode)
-                    + "&redirect_uri=" + encode(ODriveSetting.REDIRECT_URI)
-                    + "&scope=" + encode(ODriveSetting.SCOPES);
+            OAuth2AuthorizationRequest authorizationRequest = buildAuthorizationRequest();
 
-            TokenResponse tokenResponse = executeTokenRequest(body);
-            Credential credential = new Credential(tokenResponse.getAccessToken(), tokenResponse.getRefreshToken());
+            OAuth2AuthorizationResponse authorizationResponse = OAuth2AuthorizationResponse
+                    .success(authorizationCode)
+                    .redirectUri(clientRegistration.getRedirectUri())
+                    .state(CLI_STATE)
+                    .build();
+
+            OAuth2AuthorizationExchange authorizationExchange =
+                    new OAuth2AuthorizationExchange(authorizationRequest, authorizationResponse);
+
+            OAuth2AuthorizationCodeGrantRequest grantRequest =
+                    new OAuth2AuthorizationCodeGrantRequest(clientRegistration, authorizationExchange);
+
+            OAuth2AccessTokenResponse tokenResponse = authorizationCodeTokenResponseClient.getTokenResponse(grantRequest);
+
+            Credential credential = toCredential(tokenResponse);
             getODriveCredential().saveCredential(credential);
             return credential;
         } catch (Exception e) {
@@ -67,13 +102,18 @@ public class AuthorizationService extends AbstractService implements IAuthorizat
     @Override
     public Credential refreshAccessToken(String refreshToken) {
         try {
-            String body = "client_id=" + encode(oDriveSetting.getClientId())
-                    + "&grant_type=refresh_token"
-                    + "&refresh_token=" + encode(refreshToken)
-                    + "&scope=" + encode(ODriveSetting.SCOPES);
+            Instant now = Instant.now();
+            OAuth2AccessToken accessToken = new OAuth2AccessToken(
+                    OAuth2AccessToken.TokenType.BEARER, "expired",
+                    now.minusSeconds(3600), now.minusSeconds(1));
+            OAuth2RefreshToken refreshTokenObj = new OAuth2RefreshToken(refreshToken, now.minusSeconds(3600));
 
-            TokenResponse tokenResponse = executeTokenRequest(body);
-            Credential credential = new Credential(tokenResponse.getAccessToken(), tokenResponse.getRefreshToken());
+            OAuth2RefreshTokenGrantRequest refreshRequest =
+                    new OAuth2RefreshTokenGrantRequest(clientRegistration, accessToken, refreshTokenObj);
+
+            OAuth2AccessTokenResponse tokenResponse = refreshTokenResponseClient.getTokenResponse(refreshRequest);
+
+            Credential credential = toCredential(tokenResponse);
             getODriveCredential().saveCredential(credential);
             return credential;
         } catch (Exception e) {
@@ -81,25 +121,11 @@ public class AuthorizationService extends AbstractService implements IAuthorizat
         }
     }
 
-    private TokenResponse executeTokenRequest(String body) throws IOException, InterruptedException {
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(oDriveSetting.getTokenEndpoint()))
-                .header("Content-Type", "application/x-www-form-urlencoded")
-                .POST(HttpRequest.BodyPublishers.ofString(body))
-                .build();
-
-        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-        TokenResponse tokenResponse = gson.fromJson(response.body(), TokenResponse.class);
-
-        if (tokenResponse.getError() != null) {
-            throw new RuntimeException("Token request failed: " + tokenResponse.getError()
-                    + " - " + tokenResponse.getErrorDescription());
-        }
-
-        return tokenResponse;
-    }
-
-    private static String encode(String value) {
-        return URLEncoder.encode(value, StandardCharsets.UTF_8);
+    private static Credential toCredential(OAuth2AccessTokenResponse tokenResponse) {
+        String accessToken = tokenResponse.getAccessToken().getTokenValue();
+        String refreshToken = tokenResponse.getRefreshToken() != null
+                ? tokenResponse.getRefreshToken().getTokenValue()
+                : null;
+        return new Credential(accessToken, refreshToken);
     }
 }
