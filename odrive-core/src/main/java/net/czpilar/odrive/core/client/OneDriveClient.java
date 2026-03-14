@@ -22,11 +22,13 @@ public class OneDriveClient {
     private static final String GRAPH_BASE_URL = "https://graph.microsoft.com/v1.0";
 
     private final RestTemplate restTemplate;
-    private final String accessToken;
 
     public OneDriveClient(RestTemplate restTemplate, String accessToken) {
         this.restTemplate = restTemplate;
-        this.accessToken = accessToken;
+        this.restTemplate.getInterceptors().add((request, body, execution) -> {
+            request.getHeaders().setBearerAuth(accessToken);
+            return execution.execute(request, body);
+        });
     }
 
     /**
@@ -40,7 +42,7 @@ public class OneDriveClient {
         String encodedPath = encodePath(path);
         String url = GRAPH_BASE_URL + "/me/drive/root:/" + encodedPath;
         try {
-            ResponseEntity<DriveItem> response = restTemplate.exchange(url, HttpMethod.GET, new HttpEntity<>(authHeaders()), DriveItem.class);
+            ResponseEntity<DriveItem> response = restTemplate.exchange(url, HttpMethod.GET, HttpEntity.EMPTY, DriveItem.class);
             return response.getBody();
         } catch (HttpClientErrorException.NotFound e) {
             return null;
@@ -59,7 +61,7 @@ public class OneDriveClient {
     public DriveItem createFolderAtRoot(String name) {
         String url = GRAPH_BASE_URL + "/me/drive/root/children";
         try {
-            HttpEntity<CreateFolderRequest> entity = new HttpEntity<>(new CreateFolderRequest(name), authHeaders());
+            HttpEntity<CreateFolderRequest> entity = new HttpEntity<>(new CreateFolderRequest(name));
             ResponseEntity<DriveItem> response = restTemplate.exchange(url, HttpMethod.POST, entity, DriveItem.class);
             return response.getBody();
         } catch (HttpClientErrorException e) {
@@ -78,7 +80,7 @@ public class OneDriveClient {
     public DriveItem createFolder(String parentId, String name) {
         String url = GRAPH_BASE_URL + "/me/drive/items/" + parentId + "/children";
         try {
-            HttpEntity<CreateFolderRequest> entity = new HttpEntity<>(new CreateFolderRequest(name), authHeaders());
+            HttpEntity<CreateFolderRequest> entity = new HttpEntity<>(new CreateFolderRequest(name));
             ResponseEntity<DriveItem> response = restTemplate.exchange(url, HttpMethod.POST, entity, DriveItem.class);
             return response.getBody();
         } catch (HttpClientErrorException e) {
@@ -99,7 +101,7 @@ public class OneDriveClient {
         String url = GRAPH_BASE_URL + "/me/drive/root:/" + encodedPath + ":/content";
         try {
             byte[] content = Files.readAllBytes(localFile.toPath());
-            HttpHeaders headers = authHeaders();
+            HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
             HttpEntity<byte[]> entity = new HttpEntity<>(content, headers);
             ResponseEntity<DriveItem> response = restTemplate.exchange(url, HttpMethod.PUT, entity, DriveItem.class);
@@ -122,8 +124,7 @@ public class OneDriveClient {
         String encodedPath = encodePath(remotePath);
         String url = GRAPH_BASE_URL + "/me/drive/root:/" + encodedPath + ":/createUploadSession";
         try {
-            HttpEntity<Void> entity = new HttpEntity<>(authHeaders());
-            ResponseEntity<UploadSession> response = restTemplate.exchange(url, HttpMethod.POST, entity, UploadSession.class);
+            ResponseEntity<UploadSession> response = restTemplate.exchange(url, HttpMethod.POST, HttpEntity.EMPTY, UploadSession.class);
             return response.getBody();
         } catch (HttpClientErrorException e) {
             throw new OneDriveClientException("API call failed with status " + e.getStatusCode() + ": " + e.getResponseBodyAsString(), e);
@@ -155,12 +156,6 @@ public class OneDriveClient {
         } catch (HttpClientErrorException e) {
             throw new OneDriveClientException("API call failed with status " + e.getStatusCode() + ": " + e.getResponseBodyAsString(), e);
         }
-    }
-
-    private HttpHeaders authHeaders() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(accessToken);
-        return headers;
     }
 
     private String encodePath(String path) {

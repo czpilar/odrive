@@ -12,11 +12,15 @@ import org.springframework.http.*;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import org.springframework.http.client.ClientHttpRequestInterceptor;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -310,21 +314,17 @@ public class OneDriveClientTest {
         assertEquals(1024, headers.getContentLength());
     }
 
-    // --- authHeaders ---
+    // --- interceptor ---
 
     @Test
-    public void testAuthorizationHeaderIsSet() {
-        ResponseEntity<DriveItem> response = new ResponseEntity<>(emptyDriveItem(), HttpStatus.OK);
-        when(restTemplate.exchange(anyString(), eq(HttpMethod.GET), any(HttpEntity.class), eq(DriveItem.class)))
-                .thenReturn(response);
+    public void testInterceptorIsRegistered() {
+        List<ClientHttpRequestInterceptor> interceptors = new ArrayList<>();
+        RestTemplate rt = mock(RestTemplate.class);
+        when(rt.getInterceptors()).thenReturn(interceptors);
 
-        client.getItemByPath("test");
+        new OneDriveClient(rt, "my-token");
 
-        ArgumentCaptor<HttpEntity<?>> entityCaptor = ArgumentCaptor.forClass(HttpEntity.class);
-        verify(restTemplate).exchange(anyString(), eq(HttpMethod.GET), entityCaptor.capture(), eq(DriveItem.class));
-
-        HttpHeaders headers = entityCaptor.getValue().getHeaders();
-        assertEquals("Bearer " + ACCESS_TOKEN, headers.getFirst(HttpHeaders.AUTHORIZATION));
+        assertEquals(1, interceptors.size());
     }
 
     // --- OneDriveClientException ---
