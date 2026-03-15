@@ -5,17 +5,12 @@ import net.czpilar.odrive.core.client.OneDriveClient;
 import net.czpilar.odrive.core.setting.ODriveSetting;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter;
 import org.springframework.security.oauth2.client.endpoint.OAuth2AccessTokenResponseClient;
 import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCodeGrantRequest;
 import org.springframework.security.oauth2.client.endpoint.OAuth2RefreshTokenGrantRequest;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
-import org.springframework.web.client.RestTemplate;
-
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
@@ -79,45 +74,10 @@ public class ODriveCoreContextTest {
     }
 
     @Test
-    public void testGraphRestTemplate() {
-        RestTemplate restTemplate = context.graphRestTemplate();
-
-        assertNotNull(restTemplate);
-    }
-
-    @Test
-    public void testGraphRestTemplateHasJacksonConverter() {
-        RestTemplate restTemplate = context.graphRestTemplate();
-
-        List<HttpMessageConverter<?>> converters = restTemplate.getMessageConverters();
-        boolean hasJacksonConverter = converters.stream()
-                .anyMatch(c -> c instanceof JacksonJsonHttpMessageConverter);
-        assertTrue(hasJacksonConverter);
-    }
-
-    @Test
-    public void testGraphRestTemplateJacksonConverterIsFirst() {
-        RestTemplate restTemplate = context.graphRestTemplate();
-
-        assertInstanceOf(JacksonJsonHttpMessageConverter.class, restTemplate.getMessageConverters().getFirst());
-    }
-
-    @Test
-    public void testGraphRestTemplateHasExactlyOneJacksonConverter() {
-        RestTemplate restTemplate = context.graphRestTemplate();
-
-        long count = restTemplate.getMessageConverters().stream()
-                .filter(c -> c instanceof JacksonJsonHttpMessageConverter)
-                .count();
-        assertEquals(1, count);
-    }
-
-    @Test
     public void testOneDriveClient() {
-        RestTemplate restTemplate = context.graphRestTemplate();
         BearerAuthInterceptor interceptor = mock(BearerAuthInterceptor.class);
 
-        OneDriveClient client = context.oneDriveClient(restTemplate, interceptor);
+        OneDriveClient client = context.oneDriveClient(interceptor);
 
         assertNotNull(client);
     }

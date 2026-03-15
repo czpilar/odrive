@@ -14,15 +14,11 @@ import org.springframework.http.*;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import org.springframework.http.client.ClientHttpRequestInterceptor;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -36,13 +32,16 @@ public class OneDriveClientTest {
     @Mock
     private RestTemplate restTemplate;
 
+    @Mock
+    private RestTemplate chunkRestTemplate;
+
     private OneDriveClient client;
     private AutoCloseable autoCloseable;
 
     @BeforeEach
     public void before() {
         autoCloseable = MockitoAnnotations.openMocks(this);
-        client = new OneDriveClient(restTemplate, mock(BearerAuthInterceptor.class));
+        client = new OneDriveClient(restTemplate, chunkRestTemplate);
     }
 
     @AfterEach
@@ -251,7 +250,7 @@ public class OneDriveClientTest {
         DriveItem item = driveItem("completed-id");
         ResponseEntity<DriveItem> response = new ResponseEntity<>(item, HttpStatus.OK);
 
-        when(restTemplate.exchange(anyString(), eq(HttpMethod.PUT), any(HttpEntity.class), eq(DriveItem.class)))
+        when(chunkRestTemplate.exchange(anyString(), eq(HttpMethod.PUT), any(HttpEntity.class), eq(DriveItem.class)))
                 .thenReturn(response);
 
         byte[] data = "chunk-data".getBytes(StandardCharsets.UTF_8);
@@ -266,7 +265,7 @@ public class OneDriveClientTest {
         DriveItem item = driveItem("created-id");
         ResponseEntity<DriveItem> response = new ResponseEntity<>(item, HttpStatus.CREATED);
 
-        when(restTemplate.exchange(anyString(), eq(HttpMethod.PUT), any(HttpEntity.class), eq(DriveItem.class)))
+        when(chunkRestTemplate.exchange(anyString(), eq(HttpMethod.PUT), any(HttpEntity.class), eq(DriveItem.class)))
                 .thenReturn(response);
 
         byte[] data = "chunk-data".getBytes(StandardCharsets.UTF_8);
@@ -280,7 +279,7 @@ public class OneDriveClientTest {
     public void testUploadChunkAccepted() {
         ResponseEntity<DriveItem> response = ResponseEntity.status(HttpStatus.ACCEPTED).build();
 
-        when(restTemplate.exchange(anyString(), eq(HttpMethod.PUT), any(HttpEntity.class), eq(DriveItem.class)))
+        when(chunkRestTemplate.exchange(anyString(), eq(HttpMethod.PUT), any(HttpEntity.class), eq(DriveItem.class)))
                 .thenReturn(response);
 
         byte[] data = "chunk-data".getBytes(StandardCharsets.UTF_8);
@@ -291,7 +290,7 @@ public class OneDriveClientTest {
 
     @Test
     public void testUploadChunkApiError() {
-        when(restTemplate.exchange(anyString(), eq(HttpMethod.PUT), any(HttpEntity.class), eq(DriveItem.class)))
+        when(chunkRestTemplate.exchange(anyString(), eq(HttpMethod.PUT), any(HttpEntity.class), eq(DriveItem.class)))
                 .thenThrow(new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR, "Server Error"));
 
         byte[] data = "chunk-data".getBytes(StandardCharsets.UTF_8);
@@ -302,14 +301,14 @@ public class OneDriveClientTest {
     @Test
     public void testUploadChunkContentRangeHeader() {
         ResponseEntity<DriveItem> response = ResponseEntity.status(HttpStatus.ACCEPTED).build();
-        when(restTemplate.exchange(anyString(), eq(HttpMethod.PUT), any(HttpEntity.class), eq(DriveItem.class)))
+        when(chunkRestTemplate.exchange(anyString(), eq(HttpMethod.PUT), any(HttpEntity.class), eq(DriveItem.class)))
                 .thenReturn(response);
 
         byte[] data = new byte[1024];
         client.uploadChunk("https://upload.example.com/session", data, 1024, 2047, 10240);
 
         ArgumentCaptor<HttpEntity<byte[]>> entityCaptor = ArgumentCaptor.forClass(HttpEntity.class);
-        verify(restTemplate).exchange(eq("https://upload.example.com/session"), eq(HttpMethod.PUT), entityCaptor.capture(), eq(DriveItem.class));
+        verify(chunkRestTemplate).exchange(eq("https://upload.example.com/session"), eq(HttpMethod.PUT), entityCaptor.capture(), eq(DriveItem.class));
 
         HttpHeaders headers = entityCaptor.getValue().getHeaders();
         assertEquals("bytes 1024-2047/10240", headers.getFirst("Content-Range"));
@@ -317,17 +316,6 @@ public class OneDriveClientTest {
     }
 
 
-    @Test
-    public void testInterceptorIsRegistered() {
-        List<ClientHttpRequestInterceptor> interceptors = new ArrayList<>();
-        RestTemplate rt = mock(RestTemplate.class);
-        when(rt.getInterceptors()).thenReturn(interceptors);
-
-        new OneDriveClient(rt, mock(BearerAuthInterceptor.class));
-
-        assertEquals(1, interceptors.size());
-        assertInstanceOf(BearerAuthInterceptor.class, interceptors.getFirst());
-    }
 
 
     @Test

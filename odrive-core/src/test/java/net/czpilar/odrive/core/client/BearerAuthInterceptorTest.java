@@ -15,15 +15,11 @@ import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.client.HttpClientErrorException;
 
 import java.io.IOException;
-import java.net.URI;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 public class BearerAuthInterceptorTest {
-
-    private static final URI GRAPH_API_URI = URI.create("https://graph.microsoft.com/v1.0/me/drive/root");
-    private static final URI UPLOAD_SESSION_URI = URI.create("https://api.onedrive.com/up/abc123");
 
     @Mock
     private HttpRequest request;
@@ -49,7 +45,6 @@ public class BearerAuthInterceptorTest {
         autoCloseable = MockitoAnnotations.openMocks(this);
         headers = new HttpHeaders();
         when(request.getHeaders()).thenReturn(headers);
-        when(request.getURI()).thenReturn(GRAPH_API_URI);
         interceptor = new BearerAuthInterceptor(credentialLoader, authorizationService);
     }
 
@@ -117,16 +112,4 @@ public class BearerAuthInterceptorTest {
         verifyNoInteractions(authorizationService);
     }
 
-    @Test
-    public void testNonGraphApiRequestSkipsBearerAuth() throws IOException {
-        when(request.getURI()).thenReturn(UPLOAD_SESSION_URI);
-        when(execution.execute(request, new byte[0])).thenReturn(response);
-
-        interceptor.intercept(request, new byte[0], execution);
-
-        verifyNoInteractions(credentialLoader);
-        verifyNoInteractions(authorizationService);
-        verify(execution).execute(request, new byte[0]);
-        assertNull(headers.getFirst("Authorization"));
-    }
 }

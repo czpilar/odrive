@@ -51,8 +51,7 @@ public class ODriveCoreContext {
         return new RestClientRefreshTokenTokenResponseClient();
     }
 
-    @Bean
-    public RestTemplate graphRestTemplate() {
+    private RestTemplate createRestTemplate() {
         RestTemplate restTemplate = new RestTemplate();
 
         // Configure Jackson 3 message converter
@@ -69,7 +68,10 @@ public class ODriveCoreContext {
 
     @Bean
     @Lazy
-    public OneDriveClient oneDriveClient(RestTemplate graphRestTemplate, BearerAuthInterceptor bearerAuthInterceptor) {
-        return new OneDriveClient(graphRestTemplate, bearerAuthInterceptor);
+    public OneDriveClient oneDriveClient(BearerAuthInterceptor bearerAuthInterceptor) {
+        RestTemplate graphRestTemplate = createRestTemplate();
+        graphRestTemplate.getInterceptors().add(bearerAuthInterceptor);
+        RestTemplate chunkRestTemplate = createRestTemplate();
+        return new OneDriveClient(graphRestTemplate, chunkRestTemplate);
     }
 }
