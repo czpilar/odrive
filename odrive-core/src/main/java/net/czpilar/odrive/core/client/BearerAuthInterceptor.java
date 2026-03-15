@@ -40,9 +40,10 @@ public class BearerAuthInterceptor implements ClientHttpRequestInterceptor {
 
     @Override
     public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
-        if (!isGraphApiRequest(request)) {
-            return execution.execute(request, body);
-        }
+        return isGraphApiRequest(request) ? executeWithToken(request, body, execution) : execution.execute(request, body);
+    }
+
+    private ClientHttpResponse executeWithToken(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
         if (currentToken.get() == null) {
             currentToken.set(refreshAccessToken());
         }
