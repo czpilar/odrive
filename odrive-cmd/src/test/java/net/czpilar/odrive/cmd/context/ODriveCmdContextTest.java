@@ -121,7 +121,7 @@ class ODriveCmdContextTest {
 
         assertTrue(option.hasArg());
         assertTrue(option.hasOptionalArg());
-        assertEquals("code", option.getArgName());
+        assertEquals("[code]", option.getArgName());
         assertEquals("process authorization; waits for code if not provided", option.getDescription());
     }
 
@@ -131,7 +131,7 @@ class ODriveCmdContextTest {
 
         assertTrue(option.hasArg());
         assertEquals(Option.UNLIMITED_VALUES, option.getArgs());
-        assertEquals("file", option.getArgName());
+        assertEquals("<file>", option.getArgName());
         assertEquals("upload file(s)", option.getDescription());
     }
 
@@ -140,7 +140,7 @@ class ODriveCmdContextTest {
         Option option = context.options().getOption(OPTION_DIRECTORY);
 
         assertTrue(option.hasArg());
-        assertEquals("dir", option.getArgName());
+        assertEquals("<dir>", option.getArgName());
         assertEquals("directory for upload; creates new one if no directory exists; default is odrive-uploads", option.getDescription());
     }
 
@@ -149,7 +149,7 @@ class ODriveCmdContextTest {
         Option option = context.options().getOption(OPTION_PROPERTIES);
 
         assertTrue(option.hasArg());
-        assertEquals("props", option.getArgName());
+        assertEquals("<props>", option.getArgName());
         assertEquals("path to oDrive properties file", option.getDescription());
     }
 }

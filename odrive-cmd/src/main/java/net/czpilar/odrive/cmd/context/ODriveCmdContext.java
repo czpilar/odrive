@@ -6,6 +6,7 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.help.HelpFormatter;
+import org.apache.commons.cli.help.OptionFormatter;
 import org.springframework.context.annotation.*;
 
 import static net.czpilar.odrive.cmd.runner.impl.ODriveCmdRunner.*;
@@ -28,7 +29,10 @@ public class ODriveCmdContext {
 
     @Bean
     public HelpFormatter helpFormatter() {
-        return HelpFormatter.builder().setShowSince(false).get();
+        return HelpFormatter.builder()
+                .setShowSince(false)
+                .setOptionFormatBuilder(OptionFormatter.builder().setArgumentNameDelimiters("", ""))
+                .get();
     }
 
     @Bean
@@ -42,10 +46,10 @@ public class ODriveCmdContext {
                 .addOption(toOption(OPTION_VERSION, "show oDrive version"))
                 .addOption(toOption(OPTION_HELP, "show this help"))
                 .addOption(toOption(OPTION_LINK, "display authorization link"))
-                .addOption(toOptionalOption(OPTION_AUTHORIZATION, "process authorization; waits for code if not provided", "code"))
-                .addOption(toUnlimitedOption(toOption(OPTION_FILE, "upload file(s)", "file")))
-                .addOption(toOption(OPTION_DIRECTORY, "directory for upload; creates new one if no directory exists; default is odrive-uploads", "dir"))
-                .addOption(toOption(OPTION_PROPERTIES, "path to oDrive properties file", "props"));
+                .addOption(toOptionalOption(OPTION_AUTHORIZATION, "process authorization; waits for code if not provided", "[code]"))
+                .addOption(toUnlimitedOption(toOption(OPTION_FILE, "upload file(s)", "<file>")))
+                .addOption(toOption(OPTION_DIRECTORY, "directory for upload; creates new one if no directory exists; default is odrive-uploads", "<dir>"))
+                .addOption(toOption(OPTION_PROPERTIES, "path to oDrive properties file", "<props>"));
     }
 
     private Option toOption(String opt, String description) {
