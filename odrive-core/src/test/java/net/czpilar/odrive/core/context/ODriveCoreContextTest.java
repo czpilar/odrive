@@ -26,7 +26,7 @@ public class ODriveCoreContextTest {
 
     @Test
     public void testOdriveClientRegistration() {
-        ODriveSetting setting = new ODriveSetting("1.0.0", "test-client-id", "common", 8783, "/odrive");
+        ODriveSetting setting = new ODriveSetting("1.0.0", "test-client-id", "common", "http://127.0.0.1:8783/odrive", 8783, "/odrive");
 
         ClientRegistration registration = context.oDriveClientRegistration(setting);
 
@@ -45,7 +45,7 @@ public class ODriveCoreContextTest {
 
     @Test
     public void testOdriveClientRegistrationWithCustomTenant() {
-        ODriveSetting setting = new ODriveSetting("1.0.0", "my-client", "my-tenant", 9999, "/callback");
+        ODriveSetting setting = new ODriveSetting("1.0.0", "my-client", "my-tenant", "http://127.0.0.1:9999/callback", 9999, "/callback");
 
         ClientRegistration registration = context.oDriveClientRegistration(setting);
 

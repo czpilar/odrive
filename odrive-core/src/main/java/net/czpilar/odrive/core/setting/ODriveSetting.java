@@ -20,17 +20,20 @@ public class ODriveSetting {
     private final String applicationVersion;
     private final String clientId;
     private final String tenant;
+    private final String redirectUri;
     private final int redirectUriPort;
     private final String redirectUriContext;
 
     public ODriveSetting(@Value("${odrive.version}") String applicationVersion,
                          @Value("${odrive.core.drive.clientId}") String clientId,
                          @Value("${odrive.core.drive.tenant:common}") String tenant,
-                         @Value("${odrive.core.drive.redirectUri.port:8783}") int redirectUriPort,
-                         @Value("${odrive.core.drive.redirectUri.context:/odrive}") String redirectUriContext) {
+                         @Value("${odrive.core.drive.redirectUri}") String redirectUri,
+                         @Value("${odrive.core.drive.redirectUri.port}") int redirectUriPort,
+                         @Value("${odrive.core.drive.redirectUri.context}") String redirectUriContext) {
         this.applicationVersion = applicationVersion;
         this.clientId = clientId;
         this.tenant = tenant;
+        this.redirectUri = redirectUri;
         this.redirectUriPort = redirectUriPort;
         this.redirectUriContext = redirectUriContext;
     }
@@ -68,6 +71,6 @@ public class ODriveSetting {
     }
 
     public String getRedirectUri() {
-        return "http://127.0.0.1:" + redirectUriPort + redirectUriContext;
+        return redirectUri;
     }
 }
