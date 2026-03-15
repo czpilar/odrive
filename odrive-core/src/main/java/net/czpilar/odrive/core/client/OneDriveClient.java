@@ -12,8 +12,6 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Supplier;
 
 /**
  * HTTP client for Microsoft Graph API OneDrive operations.
@@ -26,22 +24,9 @@ public class OneDriveClient {
 
     private final RestTemplate restTemplate;
 
-    public OneDriveClient(RestTemplate restTemplate, Supplier<String> tokenRefresher) {
+    public OneDriveClient(RestTemplate restTemplate, BearerAuthInterceptor bearerAuthInterceptor) {
         this.restTemplate = restTemplate;
-        AtomicReference<String> currentToken = new AtomicReference<>();
-        this.restTemplate.getInterceptors().add((request, body, execution) -> {
-            if (currentToken.get() == null) {
-                currentToken.set(tokenRefresher.get());
-            }
-            request.getHeaders().setBearerAuth(currentToken.get());
-            try {
-                return execution.execute(request, body);
-            } catch (HttpClientErrorException.Unauthorized e) {
-                currentToken.set(tokenRefresher.get());
-                request.getHeaders().setBearerAuth(currentToken.get());
-                return execution.execute(request, body);
-            }
-        });
+        this.restTemplate.getInterceptors().add(bearerAuthInterceptor);
     }
 
     /**

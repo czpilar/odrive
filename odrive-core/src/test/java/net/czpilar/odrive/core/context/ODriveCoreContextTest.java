@@ -1,5 +1,6 @@
 package net.czpilar.odrive.core.context;
 
+import net.czpilar.odrive.core.client.BearerAuthInterceptor;
 import net.czpilar.odrive.core.client.OneDriveClient;
 import net.czpilar.odrive.core.client.TokenRefresher;
 import net.czpilar.odrive.core.setting.ODriveSetting;
@@ -113,11 +114,20 @@ public class ODriveCoreContextTest {
     }
 
     @Test
-    public void testOneDriveClient() {
-        RestTemplate restTemplate = context.graphRestTemplate();
+    public void testBearerAuthInterceptor() {
         TokenRefresher tokenRefresher = mock(TokenRefresher.class);
 
-        OneDriveClient client = context.oneDriveClient(restTemplate, tokenRefresher);
+        BearerAuthInterceptor interceptor = context.bearerAuthInterceptor(tokenRefresher);
+
+        assertNotNull(interceptor);
+    }
+
+    @Test
+    public void testOneDriveClient() {
+        RestTemplate restTemplate = context.graphRestTemplate();
+        BearerAuthInterceptor interceptor = mock(BearerAuthInterceptor.class);
+
+        OneDriveClient client = context.oneDriveClient(restTemplate, interceptor);
 
         assertNotNull(client);
     }

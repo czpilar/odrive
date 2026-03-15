@@ -42,7 +42,7 @@ public class OneDriveClientTest {
     @BeforeEach
     public void before() {
         autoCloseable = MockitoAnnotations.openMocks(this);
-        client = new OneDriveClient(restTemplate, () -> ACCESS_TOKEN);
+        client = new OneDriveClient(restTemplate, new BearerAuthInterceptor(() -> ACCESS_TOKEN));
     }
 
     @AfterEach
@@ -323,9 +323,10 @@ public class OneDriveClientTest {
         RestTemplate rt = mock(RestTemplate.class);
         when(rt.getInterceptors()).thenReturn(interceptors);
 
-        new OneDriveClient(rt, () -> "my-token");
+        new OneDriveClient(rt, new BearerAuthInterceptor(() -> "my-token"));
 
         assertEquals(1, interceptors.size());
+        assertInstanceOf(BearerAuthInterceptor.class, interceptors.getFirst());
     }
 
 

@@ -1,5 +1,6 @@
 package net.czpilar.odrive.core.context;
 
+import net.czpilar.odrive.core.client.BearerAuthInterceptor;
 import net.czpilar.odrive.core.client.OneDriveClient;
 import net.czpilar.odrive.core.client.TokenRefresher;
 import net.czpilar.odrive.core.setting.ODriveSetting;
@@ -69,7 +70,13 @@ public class ODriveCoreContext {
 
     @Bean
     @Lazy
-    public OneDriveClient oneDriveClient(RestTemplate graphRestTemplate, TokenRefresher tokenRefresher) {
-        return new OneDriveClient(graphRestTemplate, tokenRefresher);
+    public BearerAuthInterceptor bearerAuthInterceptor(TokenRefresher tokenRefresher) {
+        return new BearerAuthInterceptor(tokenRefresher);
+    }
+
+    @Bean
+    @Lazy
+    public OneDriveClient oneDriveClient(RestTemplate graphRestTemplate, BearerAuthInterceptor bearerAuthInterceptor) {
+        return new OneDriveClient(graphRestTemplate, bearerAuthInterceptor);
     }
 }
