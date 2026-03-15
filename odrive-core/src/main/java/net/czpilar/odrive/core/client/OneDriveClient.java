@@ -143,6 +143,7 @@ public class OneDriveClient {
     public DriveItem uploadChunk(String uploadUrl, byte[] data, long rangeStart, long rangeEnd, long totalSize) {
         try {
             HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
             headers.set("Content-Range", "bytes " + rangeStart + "-" + rangeEnd + "/" + totalSize);
             headers.setContentLength(data.length);
             HttpEntity<byte[]> entity = new HttpEntity<>(data, headers);

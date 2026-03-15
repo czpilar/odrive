@@ -27,6 +27,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public class BearerAuthInterceptor implements ClientHttpRequestInterceptor {
 
     private static final Logger LOG = LoggerFactory.getLogger(BearerAuthInterceptor.class);
+    private static final String GRAPH_API_HOST = "https://graph.microsoft.com/";
 
     private final CredentialLoader credentialLoader;
     private final IAuthorizationService authorizationService;
@@ -39,6 +40,9 @@ public class BearerAuthInterceptor implements ClientHttpRequestInterceptor {
 
     @Override
     public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
+        if (!isGraphApiRequest(request)) {
+            return execution.execute(request, body);
+        }
         if (currentToken.get() == null) {
             currentToken.set(refreshAccessToken());
         }
@@ -50,6 +54,10 @@ public class BearerAuthInterceptor implements ClientHttpRequestInterceptor {
             request.getHeaders().setBearerAuth(currentToken.get());
             return execution.execute(request, body);
         }
+    }
+
+    private boolean isGraphApiRequest(HttpRequest request) {
+        return request.getURI().toString().startsWith(GRAPH_API_HOST);
     }
 
     private String refreshAccessToken() {

@@ -1,10 +1,12 @@
 package net.czpilar.odrive.cmd;
 
+import net.czpilar.odrive.core.request.FileRequest;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.nio.charset.Charset;
 
 /**
@@ -56,6 +58,15 @@ public class ODriveIntegrationTest {
         }
     }
 
+    private void createLargeFileIfNotExist(String filename, long size) throws IOException {
+        File file = new File(filename);
+        if (!file.exists()) {
+            try (RandomAccessFile raf = new RandomAccessFile(file, "rw")) {
+                raf.setLength(size);
+            }
+        }
+    }
+
     @Test
     public void testUploadFiles() throws IOException {
         String filename1 = "target/test1.txt";
@@ -72,5 +83,28 @@ public class ODriveIntegrationTest {
         String filename = "target/test1.txt";
         createFileIfNotExist(filename);
         ODrive.main(new String[]{"-f", filename, "-d", "odrive-test-backup/odrive-subdir/odrive-last-dir", "-p", PROPERTIES});
+    }
+
+    @Test
+    public void testUploadLargeFile() throws IOException {
+        String filename = "target/test-large-file.bin";
+        createLargeFileIfNotExist(filename, FileRequest.SMALL_FILE_LIMIT + 1);
+        ODrive.main(new String[]{"-f", filename, "-d", "odrive-test-backup", "-p", PROPERTIES});
+    }
+
+    @Test
+    public void testUploadLargeFileMultipleChunks() throws IOException {
+        String filename = "target/test-large-file-multi-chunk.bin";
+        createLargeFileIfNotExist(filename, FileRequest.CHUNK_SIZE * 3L + 1);
+        ODrive.main(new String[]{"-f", filename, "-d", "odrive-test-backup", "-p", PROPERTIES});
+    }
+
+    @Test
+    public void testUploadSmallAndLargeFiles() throws IOException {
+        String smallFilename = "target/test-small.txt";
+        String largeFilename = "target/test-large-file-mixed.bin";
+        createFileIfNotExist(smallFilename);
+        createLargeFileIfNotExist(largeFilename, FileRequest.SMALL_FILE_LIMIT + 1);
+        ODrive.main(new String[]{"-f", smallFilename, largeFilename, "-d", "odrive-test-backup", "-p", PROPERTIES});
     }
 }
