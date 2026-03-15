@@ -1,64 +1,29 @@
 package net.czpilar.odrive.core.credential.impl;
 
-import net.czpilar.odrive.core.credential.Credential;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.*;
 
 public class AbstractODriveCredentialTest {
 
-    @Mock
-    private AbstractODriveCredential oDriveCredential;
-
-    private AutoCloseable autoCloseable;
-
-    @BeforeEach
-    public void before() {
-        autoCloseable = MockitoAnnotations.openMocks(this);
-    }
-
-    @AfterEach
-    public void after() throws Exception {
-        autoCloseable.close();
-    }
-
     @Test
-    public void testGetCredential() {
-        when(oDriveCredential.getCredential()).thenCallRealMethod();
-        when(oDriveCredential.getAccessToken()).thenReturn("access-token");
-        when(oDriveCredential.getRefreshToken()).thenReturn("refresh-token");
+    public void testAbstractODriveCredentialIsAbstract() {
+        AbstractODriveCredential credential = new AbstractODriveCredential() {
+            @Override
+            public String getRefreshToken() {
+                return null;
+            }
 
-        Credential result = oDriveCredential.getCredential();
+            @Override
+            public void saveRefreshToken(String refreshToken) {
+            }
 
-        assertNotNull(result);
-        assertEquals("access-token", result.accessToken());
-        assertEquals("refresh-token", result.refreshToken());
+            @Override
+            public String getUploadDir() {
+                return null;
+            }
+        };
 
-        verify(oDriveCredential).getCredential();
-        verify(oDriveCredential).getAccessToken();
-        verify(oDriveCredential).getRefreshToken();
-
-        verifyNoMoreInteractions(oDriveCredential);
-    }
-
-    @Test
-    public void testSaveCredential() {
-        doCallRealMethod().when(oDriveCredential).saveCredential(any(Credential.class));
-        doNothing().when(oDriveCredential).saveTokens(anyString(), anyString());
-
-        Credential credential = new Credential("access-token", "refresh-token");
-
-        oDriveCredential.saveCredential(credential);
-
-        verify(oDriveCredential).saveCredential(any(Credential.class));
-        verify(oDriveCredential).saveTokens("access-token", "refresh-token");
-
-        verifyNoMoreInteractions(oDriveCredential);
+        assertNotNull(credential);
     }
 }

@@ -2,6 +2,7 @@ package net.czpilar.odrive.core.service.impl;
 
 import net.czpilar.odrive.core.client.OneDriveClient;
 import net.czpilar.odrive.core.exception.DirectoryHandleException;
+import net.czpilar.odrive.core.exception.OneDriveClientException;
 import net.czpilar.odrive.core.model.DriveItem;
 import net.czpilar.odrive.core.service.IDirectoryService;
 import org.apache.commons.lang3.StringUtils;
@@ -40,7 +41,7 @@ public class DirectoryService extends AbstractFileService implements IDirectoryS
                 return getOneDriveClient().createFolderAtRoot(dirname);
             }
             return getOneDriveClient().createFolder(parentDir.id(), dirname);
-        } catch (OneDriveClient.OneDriveClientException e) {
+        } catch (OneDriveClientException e) {
             LOG.error("Unable to create directory {}.", dirname);
             throw new DirectoryHandleException("Unable to create directory.", e);
         }

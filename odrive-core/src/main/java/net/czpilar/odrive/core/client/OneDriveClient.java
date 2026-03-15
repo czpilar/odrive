@@ -1,5 +1,6 @@
 package net.czpilar.odrive.core.client;
 
+import net.czpilar.odrive.core.exception.OneDriveClientException;
 import net.czpilar.odrive.core.model.DriveItem;
 import net.czpilar.odrive.core.model.UploadSession;
 import org.springframework.http.*;
@@ -11,6 +12,8 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Supplier;
 
 /**
  * HTTP client for Microsoft Graph API OneDrive operations.
@@ -23,11 +26,21 @@ public class OneDriveClient {
 
     private final RestTemplate restTemplate;
 
-    public OneDriveClient(RestTemplate restTemplate, String accessToken) {
+    public OneDriveClient(RestTemplate restTemplate, Supplier<String> tokenRefresher) {
         this.restTemplate = restTemplate;
+        AtomicReference<String> currentToken = new AtomicReference<>();
         this.restTemplate.getInterceptors().add((request, body, execution) -> {
-            request.getHeaders().setBearerAuth(accessToken);
-            return execution.execute(request, body);
+            if (currentToken.get() == null) {
+                currentToken.set(tokenRefresher.get());
+            }
+            request.getHeaders().setBearerAuth(currentToken.get());
+            try {
+                return execution.execute(request, body);
+            } catch (HttpClientErrorException.Unauthorized e) {
+                currentToken.set(tokenRefresher.get());
+                request.getHeaders().setBearerAuth(currentToken.get());
+                return execution.execute(request, body);
+            }
         });
     }
 
@@ -173,13 +186,4 @@ public class OneDriveClient {
         return encoded.toString();
     }
 
-    public static class OneDriveClientException extends RuntimeException {
-        public OneDriveClientException(String message) {
-            super(message);
-        }
-
-        public OneDriveClientException(String message, Throwable cause) {
-            super(message, cause);
-        }
-    }
 }

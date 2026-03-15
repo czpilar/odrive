@@ -92,7 +92,7 @@ public class AuthorizationService extends AbstractService implements IAuthorizat
             OAuth2AccessTokenResponse tokenResponse = authorizationCodeTokenResponseClient.getTokenResponse(grantRequest);
 
             Credential credential = toCredential(tokenResponse);
-            getODriveCredential().saveCredential(credential);
+            getODriveCredential().saveRefreshToken(credential.refreshToken());
             return credential;
         } catch (Exception e) {
             throw new AuthorizationFailedException("Error occurs during authorization process.", e);
@@ -114,7 +114,7 @@ public class AuthorizationService extends AbstractService implements IAuthorizat
             OAuth2AccessTokenResponse tokenResponse = refreshTokenResponseClient.getTokenResponse(refreshRequest);
 
             Credential credential = toCredential(tokenResponse);
-            getODriveCredential().saveCredential(credential);
+            getODriveCredential().saveRefreshToken(credential.refreshToken());
             return credential;
         } catch (Exception e) {
             throw new AuthorizationFailedException("Error occurs during token refresh.", e);

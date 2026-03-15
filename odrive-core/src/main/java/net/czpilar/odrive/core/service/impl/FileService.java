@@ -2,6 +2,7 @@ package net.czpilar.odrive.core.service.impl;
 
 import net.czpilar.odrive.core.client.OneDriveClient;
 import net.czpilar.odrive.core.exception.FileHandleException;
+import net.czpilar.odrive.core.exception.OneDriveClientException;
 import net.czpilar.odrive.core.listener.impl.FileUploadProgressListener;
 import net.czpilar.odrive.core.model.DriveItem;
 import net.czpilar.odrive.core.request.FileRequest;
@@ -86,7 +87,7 @@ public class FileService extends AbstractFileService implements IFileService {
         while (true) {
             try {
                 return request.execute();
-            } catch (OneDriveClient.OneDriveClientException e) {
+            } catch (OneDriveClientException e) {
                 retry++;
                 if (retry > getRetries()) {
                     throw e;

@@ -1,6 +1,5 @@
 package net.czpilar.odrive.core.credential.loader;
 
-import net.czpilar.odrive.core.credential.Credential;
 import net.czpilar.odrive.core.credential.IODriveCredential;
 import net.czpilar.odrive.core.exception.NoCredentialFoundException;
 import org.junit.jupiter.api.AfterEach;
@@ -19,9 +18,6 @@ public class CredentialLoaderTest {
     @Mock
     private IODriveCredential oDriveCredential;
 
-    @Mock
-    private Credential credential;
-
     private AutoCloseable autoCloseable;
 
     @BeforeEach
@@ -36,22 +32,31 @@ public class CredentialLoaderTest {
     }
 
     @Test
-    public void testGetCredentialWhereNoCredentialLoaded() {
-        assertThrows(NoCredentialFoundException.class, () -> new CredentialLoader(null).getCredential());
+    public void testConstructorWithNullCredential() {
+        assertThrows(NoCredentialFoundException.class, () -> new CredentialLoader(null));
     }
 
     @Test
-    public void testGetCredential() {
-        when(oDriveCredential.getCredential()).thenReturn(credential);
+    public void testGetRefreshToken() {
+        when(oDriveCredential.getRefreshToken()).thenReturn("test-refresh-token");
 
-        Credential result = loader.getCredential();
+        String result = loader.getRefreshToken();
 
-        assertNotNull(result);
-        assertEquals(credential, result);
+        assertEquals("test-refresh-token", result);
 
-        verify(oDriveCredential).getCredential();
-
+        verify(oDriveCredential).getRefreshToken();
         verifyNoMoreInteractions(oDriveCredential);
-        verifyNoInteractions(credential);
+    }
+
+    @Test
+    public void testGetRefreshTokenReturnsNull() {
+        when(oDriveCredential.getRefreshToken()).thenReturn(null);
+
+        String result = loader.getRefreshToken();
+
+        assertNull(result);
+
+        verify(oDriveCredential).getRefreshToken();
+        verifyNoMoreInteractions(oDriveCredential);
     }
 }

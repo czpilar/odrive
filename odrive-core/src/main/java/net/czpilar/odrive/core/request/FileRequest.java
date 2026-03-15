@@ -2,6 +2,7 @@ package net.czpilar.odrive.core.request;
 
 import net.czpilar.odrive.core.client.OneDriveClient;
 import net.czpilar.odrive.core.exception.ODriveException;
+import net.czpilar.odrive.core.exception.OneDriveClientException;
 import net.czpilar.odrive.core.listener.IFileUploadProgressListener;
 import net.czpilar.odrive.core.model.DriveItem;
 import net.czpilar.odrive.core.model.UploadSession;
@@ -102,7 +103,7 @@ public class FileRequest {
         while (true) {
             try {
                 return client.uploadChunk(uploadUrl, data, rangeStart, rangeEnd, totalSize);
-            } catch (OneDriveClient.OneDriveClientException e) {
+            } catch (OneDriveClientException e) {
                 retry++;
                 if (retry > CHUNK_RETRIES) {
                     throw e;

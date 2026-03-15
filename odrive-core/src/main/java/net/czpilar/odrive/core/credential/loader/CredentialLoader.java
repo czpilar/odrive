@@ -1,6 +1,5 @@
 package net.czpilar.odrive.core.credential.loader;
 
-import net.czpilar.odrive.core.credential.Credential;
 import net.czpilar.odrive.core.credential.IODriveCredential;
 import net.czpilar.odrive.core.exception.NoCredentialFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +23,7 @@ public class CredentialLoader {
         this.oDriveCredential = oDriveCredential;
     }
 
-    public Credential getCredential() {
-        return oDriveCredential.getCredential();
+    public String getRefreshToken() {
+        return oDriveCredential.getRefreshToken();
     }
 }

@@ -8,32 +8,17 @@ package net.czpilar.odrive.core.credential.impl;
  */
 public class SimpleODriveCredential extends AbstractODriveCredential {
 
-    private String accessToken;
     private String refreshToken;
     private String uploadDir;
 
     @Override
-    protected String getAccessToken() {
-        return accessToken;
-    }
-
-    public void setAccessToken(String accessToken) {
-        this.accessToken = accessToken;
-    }
-
-    @Override
-    protected String getRefreshToken() {
+    public String getRefreshToken() {
         return refreshToken;
     }
 
-    public void setRefreshToken(String refreshToken) {
-        this.refreshToken = refreshToken;
-    }
-
     @Override
-    protected void saveTokens(String accessToken, String refreshToken) {
-        setAccessToken(accessToken);
-        setRefreshToken(refreshToken);
+    public void saveRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
     }
 
     @Override

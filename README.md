@@ -45,7 +45,6 @@ If you want to change upload directory:
    `odrive -p odrive.properties -f <file> -d <path>/<to>/<dir>`
 
 ### How to use properties file
-- `odrive.accessToken` - OneDrive access token; this property is updated automatically by oDrive
 - `odrive.refreshToken` - OneDrive refresh token; this property is updated automatically by oDrive
 - `odrive.uploadDir` - path to dir where files will be uploaded: `<path>/<to>/<dir>`
 

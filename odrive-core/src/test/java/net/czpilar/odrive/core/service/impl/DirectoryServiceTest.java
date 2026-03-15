@@ -2,6 +2,7 @@ package net.czpilar.odrive.core.service.impl;
 
 import net.czpilar.odrive.core.client.OneDriveClient;
 import net.czpilar.odrive.core.exception.DirectoryHandleException;
+import net.czpilar.odrive.core.exception.OneDriveClientException;
 import net.czpilar.odrive.core.model.DriveItem;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -89,7 +90,7 @@ public class DirectoryServiceTest {
         String dirname = "test-dirname";
 
         when(serviceMock.createOneDirectory(anyString(), any())).thenCallRealMethod();
-        when(oneDriveClient.createFolderAtRoot(dirname)).thenThrow(new OneDriveClient.OneDriveClientException("error"));
+        when(oneDriveClient.createFolderAtRoot(dirname)).thenThrow(new OneDriveClientException("error"));
 
         assertThrows(DirectoryHandleException.class, () -> serviceMock.createOneDirectory(dirname, null));
 

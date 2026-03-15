@@ -1,5 +1,6 @@
 package net.czpilar.odrive.core.client;
 
+import net.czpilar.odrive.core.exception.OneDriveClientException;
 import net.czpilar.odrive.core.model.DriveItem;
 import net.czpilar.odrive.core.model.UploadSession;
 import org.junit.jupiter.api.AfterEach;
@@ -41,7 +42,7 @@ public class OneDriveClientTest {
     @BeforeEach
     public void before() {
         autoCloseable = MockitoAnnotations.openMocks(this);
-        client = new OneDriveClient(restTemplate, ACCESS_TOKEN);
+        client = new OneDriveClient(restTemplate, () -> ACCESS_TOKEN);
     }
 
     @AfterEach
@@ -91,7 +92,7 @@ public class OneDriveClientTest {
         when(restTemplate.exchange(anyString(), eq(HttpMethod.GET), any(HttpEntity.class), eq(DriveItem.class)))
                 .thenThrow(new HttpClientErrorException(HttpStatus.FORBIDDEN, "Forbidden"));
 
-        assertThrows(OneDriveClient.OneDriveClientException.class, () -> client.getItemByPath("path"));
+        assertThrows(OneDriveClientException.class, () -> client.getItemByPath("path"));
     }
 
     @Test
@@ -144,7 +145,7 @@ public class OneDriveClientTest {
         when(restTemplate.exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class), eq(DriveItem.class)))
                 .thenThrow(new HttpClientErrorException(HttpStatus.CONFLICT, "Conflict"));
 
-        assertThrows(OneDriveClient.OneDriveClientException.class, () -> client.createFolderAtRoot("TestFolder"));
+        assertThrows(OneDriveClientException.class, () -> client.createFolderAtRoot("TestFolder"));
     }
 
 
@@ -171,7 +172,7 @@ public class OneDriveClientTest {
         when(restTemplate.exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class), eq(DriveItem.class)))
                 .thenThrow(new HttpClientErrorException(HttpStatus.FORBIDDEN, "Forbidden"));
 
-        assertThrows(OneDriveClient.OneDriveClientException.class, () -> client.createFolder("parent-id", "Folder"));
+        assertThrows(OneDriveClientException.class, () -> client.createFolder("parent-id", "Folder"));
     }
 
 
@@ -200,7 +201,7 @@ public class OneDriveClientTest {
     public void testUploadSmallFileWithNonExistentFile() {
         File localFile = new File("non-existent-file.txt");
 
-        assertThrows(OneDriveClient.OneDriveClientException.class,
+        assertThrows(OneDriveClientException.class,
                 () -> client.uploadSmallFile("remote/path.txt", localFile));
     }
 
@@ -212,7 +213,7 @@ public class OneDriveClientTest {
         when(restTemplate.exchange(anyString(), eq(HttpMethod.PUT), any(HttpEntity.class), eq(DriveItem.class)))
                 .thenThrow(new HttpClientErrorException(HttpStatus.INSUFFICIENT_STORAGE, "Insufficient Storage"));
 
-        assertThrows(OneDriveClient.OneDriveClientException.class,
+        assertThrows(OneDriveClientException.class,
                 () -> client.uploadSmallFile("Documents/test.txt", localFile));
     }
 
@@ -240,7 +241,7 @@ public class OneDriveClientTest {
         when(restTemplate.exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class), eq(UploadSession.class)))
                 .thenThrow(new HttpClientErrorException(HttpStatus.FORBIDDEN, "Forbidden"));
 
-        assertThrows(OneDriveClient.OneDriveClientException.class,
+        assertThrows(OneDriveClientException.class,
                 () -> client.createUploadSession("Documents/large-file.zip"));
     }
 
@@ -294,7 +295,7 @@ public class OneDriveClientTest {
                 .thenThrow(new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR, "Server Error"));
 
         byte[] data = "chunk-data".getBytes(StandardCharsets.UTF_8);
-        assertThrows(OneDriveClient.OneDriveClientException.class,
+        assertThrows(OneDriveClientException.class,
                 () -> client.uploadChunk("https://upload.example.com/session", data, 0, 9, 100));
     }
 
@@ -322,7 +323,7 @@ public class OneDriveClientTest {
         RestTemplate rt = mock(RestTemplate.class);
         when(rt.getInterceptors()).thenReturn(interceptors);
 
-        new OneDriveClient(rt, "my-token");
+        new OneDriveClient(rt, () -> "my-token");
 
         assertEquals(1, interceptors.size());
     }
@@ -330,8 +331,9 @@ public class OneDriveClientTest {
 
     @Test
     public void testOneDriveClientExceptionWithMessage() {
-        OneDriveClient.OneDriveClientException ex = new OneDriveClient.OneDriveClientException("test message");
+        OneDriveClientException ex = new OneDriveClientException("test message");
 
+        assertInstanceOf(net.czpilar.odrive.core.exception.ODriveException.class, ex);
         assertEquals("test message", ex.getMessage());
         assertNull(ex.getCause());
     }
@@ -339,8 +341,9 @@ public class OneDriveClientTest {
     @Test
     public void testOneDriveClientExceptionWithMessageAndCause() {
         RuntimeException cause = new RuntimeException("cause");
-        OneDriveClient.OneDriveClientException ex = new OneDriveClient.OneDriveClientException("test message", cause);
+        OneDriveClientException ex = new OneDriveClientException("test message", cause);
 
+        assertInstanceOf(net.czpilar.odrive.core.exception.ODriveException.class, ex);
         assertEquals("test message", ex.getMessage());
         assertEquals(cause, ex.getCause());
     }

@@ -16,37 +16,15 @@ public class SimpleODriveCredentialTest {
     }
 
     @Test
-    public void testSetAndGetAccessToken() {
-        assertNull(credential.getAccessToken());
-
-        String accessToken = "test-access-token";
-        credential.setAccessToken(accessToken);
-
-        assertEquals(accessToken, credential.getAccessToken());
+    public void testGetRefreshTokenReturnsNull() {
+        assertNull(credential.getRefreshToken());
     }
 
     @Test
-    public void testSetAndGetRefreshToken() {
-        assertNull(credential.getRefreshToken());
+    public void testSaveAndGetRefreshToken() {
+        credential.saveRefreshToken("test-refresh-token");
 
-        String refreshToken = "test-refresh-token";
-        credential.setRefreshToken(refreshToken);
-
-        assertEquals(refreshToken, credential.getRefreshToken());
-    }
-
-    @Test
-    public void testSaveTokens() {
-        assertNull(credential.getAccessToken());
-        assertNull(credential.getRefreshToken());
-
-        String accessToken = "test-access-token";
-        String refreshToken = "test-refresh-token";
-
-        credential.saveTokens(accessToken, refreshToken);
-
-        assertEquals(accessToken, credential.getAccessToken());
-        assertEquals(refreshToken, credential.getRefreshToken());
+        assertEquals("test-refresh-token", credential.getRefreshToken());
     }
 
     @Test

@@ -18,17 +18,15 @@ import java.util.Properties;
 public class PropertiesODriveCredential extends AbstractODriveCredential {
 
     private final String uploadDirPropertyKey;
-    private final String accessTokenPropertyKey;
     private final String refreshTokenPropertyKey;
     private final String defaultUploadDir;
 
     private String propertyFile;
     private Properties properties;
 
-    public PropertiesODriveCredential(String uploadDirPropertyKey, String accessTokenPropertyKey,
+    public PropertiesODriveCredential(String uploadDirPropertyKey,
                                       String refreshTokenPropertyKey, String defaultUploadDir) {
         this.uploadDirPropertyKey = uploadDirPropertyKey;
-        this.accessTokenPropertyKey = accessTokenPropertyKey;
         this.refreshTokenPropertyKey = refreshTokenPropertyKey;
         this.defaultUploadDir = defaultUploadDir;
     }
@@ -76,29 +74,15 @@ public class PropertiesODriveCredential extends AbstractODriveCredential {
     }
 
     @Override
-    public String getAccessToken() {
-        return getProperties().getProperty(accessTokenPropertyKey);
-    }
-
-    public void setAccessToken(String accessToken) {
-        getProperties().setProperty(accessTokenPropertyKey, accessToken);
-    }
-
-    @Override
     public String getRefreshToken() {
         return getProperties().getProperty(refreshTokenPropertyKey);
     }
 
-    public void setRefreshToken(String refreshToken) {
+    @Override
+    public void saveRefreshToken(String refreshToken) {
         if (refreshToken != null) {
             getProperties().setProperty(refreshTokenPropertyKey, refreshToken);
         }
-    }
-
-    @Override
-    public void saveTokens(String accessToken, String refreshToken) {
-        setAccessToken(accessToken);
-        setRefreshToken(refreshToken);
         saveProperties();
     }
 

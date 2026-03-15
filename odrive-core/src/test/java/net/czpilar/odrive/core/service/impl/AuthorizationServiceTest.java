@@ -113,7 +113,7 @@ public class AuthorizationServiceTest {
         assertEquals("test-refresh-token", result.refreshToken());
 
         verify(authorizationCodeTokenResponseClient).getTokenResponse(any(OAuth2AuthorizationCodeGrantRequest.class));
-        verify(oDriveCredential).saveCredential(any(Credential.class));
+        verify(oDriveCredential).saveRefreshToken("test-refresh-token");
     }
 
     @Test
@@ -148,7 +148,7 @@ public class AuthorizationServiceTest {
         assertEquals("new-refresh-token", result.refreshToken());
 
         verify(refreshTokenResponseClient).getTokenResponse(any(OAuth2RefreshTokenGrantRequest.class));
-        verify(oDriveCredential).saveCredential(any(Credential.class));
+        verify(oDriveCredential).saveRefreshToken("new-refresh-token");
     }
 
     @Test

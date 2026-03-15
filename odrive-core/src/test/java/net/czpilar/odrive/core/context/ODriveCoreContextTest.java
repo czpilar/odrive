@@ -1,15 +1,10 @@
 package net.czpilar.odrive.core.context;
 
 import net.czpilar.odrive.core.client.OneDriveClient;
-import net.czpilar.odrive.core.credential.Credential;
-import net.czpilar.odrive.core.credential.loader.CredentialLoader;
-import net.czpilar.odrive.core.service.IAuthorizationService;
+import net.czpilar.odrive.core.client.TokenRefresher;
 import net.czpilar.odrive.core.setting.ODriveSetting;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter;
 import org.springframework.security.oauth2.client.endpoint.OAuth2AccessTokenResponseClient;
@@ -23,28 +18,15 @@ import org.springframework.web.client.RestTemplate;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
 
 public class ODriveCoreContextTest {
 
-    @Mock
-    private CredentialLoader credentialLoader;
-
-    @Mock
-    private IAuthorizationService authorizationService;
-
     private ODriveCoreContext context;
-    private AutoCloseable autoCloseable;
 
     @BeforeEach
     public void before() {
-        autoCloseable = MockitoAnnotations.openMocks(this);
-        context = new ODriveCoreContext(credentialLoader, authorizationService);
-    }
-
-    @AfterEach
-    public void after() throws Exception {
-        autoCloseable.close();
+        context = new ODriveCoreContext();
     }
 
     @Test
@@ -131,52 +113,12 @@ public class ODriveCoreContextTest {
     }
 
     @Test
-    public void testOneDriveClientWithAccessToken() {
-        Credential credential = new Credential("my-access-token", "my-refresh-token");
-        when(credentialLoader.getCredential()).thenReturn(credential);
-
+    public void testOneDriveClient() {
         RestTemplate restTemplate = context.graphRestTemplate();
-        OneDriveClient client = context.oneDriveClient(restTemplate);
+        TokenRefresher tokenRefresher = mock(TokenRefresher.class);
+
+        OneDriveClient client = context.oneDriveClient(restTemplate, tokenRefresher);
 
         assertNotNull(client);
-        verifyNoInteractions(authorizationService);
-    }
-
-    @Test
-    public void testOneDriveClientRefreshesWhenAccessTokenIsNull() {
-        Credential credential = new Credential(null, "my-refresh-token");
-        Credential refreshed = new Credential("refreshed-access-token", "new-refresh-token");
-        when(credentialLoader.getCredential()).thenReturn(credential);
-        when(authorizationService.refreshAccessToken("my-refresh-token")).thenReturn(refreshed);
-
-        RestTemplate restTemplate = context.graphRestTemplate();
-        OneDriveClient client = context.oneDriveClient(restTemplate);
-
-        assertNotNull(client);
-        verify(authorizationService).refreshAccessToken("my-refresh-token");
-    }
-
-    @Test
-    public void testOneDriveClientDoesNotRefreshWhenRefreshTokenIsNull() {
-        Credential credential = new Credential(null, null);
-        when(credentialLoader.getCredential()).thenReturn(credential);
-
-        RestTemplate restTemplate = context.graphRestTemplate();
-        OneDriveClient client = context.oneDriveClient(restTemplate);
-
-        assertNotNull(client);
-        verifyNoInteractions(authorizationService);
-    }
-
-    @Test
-    public void testOneDriveClientDoesNotRefreshWhenBothTokensPresent() {
-        Credential credential = new Credential("access", "refresh");
-        when(credentialLoader.getCredential()).thenReturn(credential);
-
-        RestTemplate restTemplate = context.graphRestTemplate();
-        OneDriveClient client = context.oneDriveClient(restTemplate);
-
-        assertNotNull(client);
-        verifyNoInteractions(authorizationService);
     }
 }

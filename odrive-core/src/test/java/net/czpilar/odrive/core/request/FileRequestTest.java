@@ -2,6 +2,7 @@ package net.czpilar.odrive.core.request;
 
 import net.czpilar.odrive.core.client.OneDriveClient;
 import net.czpilar.odrive.core.exception.ODriveException;
+import net.czpilar.odrive.core.exception.OneDriveClientException;
 import net.czpilar.odrive.core.listener.IFileUploadProgressListener;
 import net.czpilar.odrive.core.model.DriveItem;
 import net.czpilar.odrive.core.model.UploadSession;
@@ -163,7 +164,7 @@ public class FileRequestTest {
 
         // First call fails, second succeeds
         when(client.uploadChunk(anyString(), any(byte[].class), anyLong(), anyLong(), anyLong()))
-                .thenThrow(new OneDriveClient.OneDriveClientException("Transient error"))
+                .thenThrow(new OneDriveClientException("Transient error"))
                 .thenReturn(completedItem);
 
         FileRequest request = FileRequest.create(client, "remote/large.bin", localFile);
@@ -184,11 +185,11 @@ public class FileRequestTest {
         when(client.createUploadSession("remote/large.bin")).thenReturn(session);
 
         when(client.uploadChunk(anyString(), any(byte[].class), anyLong(), anyLong(), anyLong()))
-                .thenThrow(new OneDriveClient.OneDriveClientException("Persistent error"));
+                .thenThrow(new OneDriveClientException("Persistent error"));
 
         FileRequest request = FileRequest.create(client, "remote/large.bin", localFile);
 
-        assertThrows(OneDriveClient.OneDriveClientException.class, () -> request.execute());
+        assertThrows(OneDriveClientException.class, () -> request.execute());
         // Should be called CHUNK_RETRIES + 1 times (initial + retries)
         verify(client, times(FileRequest.CHUNK_RETRIES + 1))
                 .uploadChunk(anyString(), any(byte[].class), anyLong(), anyLong(), anyLong());

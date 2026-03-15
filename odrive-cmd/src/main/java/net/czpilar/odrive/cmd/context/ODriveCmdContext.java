@@ -17,13 +17,12 @@ import static net.czpilar.odrive.cmd.runner.impl.ODriveCmdRunner.*;
 public class ODriveCmdContext {
 
     public static final String UPLOAD_DIR_PROPERTY_KEY = "odrive.uploadDir";
-    public static final String ACCESS_TOKEN_PROPERTY_KEY = "odrive.accessToken";
     public static final String REFRESH_TOKEN_PROPERTY_KEY = "odrive.refreshToken";
     public static final String DEFAULT_UPLOAD_DIR = "odrive-uploads";
 
     @Bean
     public PropertiesODriveCredential propertiesODriveCredential() {
-        return new PropertiesODriveCredential(UPLOAD_DIR_PROPERTY_KEY, ACCESS_TOKEN_PROPERTY_KEY,
+        return new PropertiesODriveCredential(UPLOAD_DIR_PROPERTY_KEY,
                 REFRESH_TOKEN_PROPERTY_KEY, DEFAULT_UPLOAD_DIR);
     }
 

@@ -29,7 +29,6 @@ public class ODriveCmdContextTest {
     @Test
     public void testConstants() {
         assertEquals("odrive.uploadDir", ODriveCmdContext.UPLOAD_DIR_PROPERTY_KEY);
-        assertEquals("odrive.accessToken", ODriveCmdContext.ACCESS_TOKEN_PROPERTY_KEY);
         assertEquals("odrive.refreshToken", ODriveCmdContext.REFRESH_TOKEN_PROPERTY_KEY);
         assertEquals("odrive-uploads", ODriveCmdContext.DEFAULT_UPLOAD_DIR);
     }

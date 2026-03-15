@@ -2,6 +2,7 @@ package net.czpilar.odrive.core.service.impl;
 
 import net.czpilar.odrive.core.client.OneDriveClient;
 import net.czpilar.odrive.core.exception.FileHandleException;
+import net.czpilar.odrive.core.exception.OneDriveClientException;
 import net.czpilar.odrive.core.model.DriveItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,7 +46,7 @@ public abstract class AbstractFileService extends AbstractService {
         try {
             String path = getPath(filename, parent);
             return getOneDriveClient().getItemByPath(path);
-        } catch (OneDriveClient.OneDriveClientException e) {
+        } catch (OneDriveClientException e) {
             LOG.error("Unable to find {}.", filename);
             throw new FileHandleException("Unable to find file.", e);
         }

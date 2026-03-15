@@ -2,6 +2,7 @@ package net.czpilar.odrive.core.service.impl;
 
 import net.czpilar.odrive.core.client.OneDriveClient;
 import net.czpilar.odrive.core.exception.FileHandleException;
+import net.czpilar.odrive.core.exception.OneDriveClientException;
 import net.czpilar.odrive.core.model.DriveItem;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -178,7 +179,7 @@ public class AbstractFileServiceTest {
 
         when(service.findFile(anyString(), any())).thenCallRealMethod();
         when(service.getPath(anyString(), any())).thenReturn("/test-file");
-        when(oneDriveClient.getItemByPath("/test-file")).thenThrow(new OneDriveClient.OneDriveClientException("error"));
+        when(oneDriveClient.getItemByPath("/test-file")).thenThrow(new OneDriveClientException("error"));
 
         assertThrows(FileHandleException.class, () -> service.findFile(filename, parent));
     }
