@@ -25,7 +25,7 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-public class AuthorizationServiceTest {
+class AuthorizationServiceTest {
 
     private final AuthorizationService service = new AuthorizationService();
 
@@ -46,7 +46,7 @@ public class AuthorizationServiceTest {
     private AutoCloseable autoCloseable;
 
     @BeforeEach
-    public void before() {
+    void before() {
         autoCloseable = MockitoAnnotations.openMocks(this);
 
         clientRegistration = ClientRegistration.withRegistrationId("microsoft")
@@ -70,12 +70,12 @@ public class AuthorizationServiceTest {
     }
 
     @AfterEach
-    public void after() throws Exception {
+    void after() throws Exception {
         autoCloseable.close();
     }
 
     @Test
-    public void testGetAuthorizationURL() {
+    void testGetAuthorizationURL() {
         String result = service.getAuthorizationURL();
 
         assertNotNull(result);
@@ -87,7 +87,7 @@ public class AuthorizationServiceTest {
     }
 
     @Test
-    public void testAuthorize() {
+    void testAuthorize() {
         String authorizationCode = "test-authorization-code";
 
         Instant now = Instant.now();
@@ -117,7 +117,7 @@ public class AuthorizationServiceTest {
     }
 
     @Test
-    public void testAuthorizeWithException() {
+    void testAuthorizeWithException() {
         String authorizationCode = "test-authorization-code";
 
         when(authorizationCodeTokenResponseClient.getTokenResponse(any(OAuth2AuthorizationCodeGrantRequest.class)))
@@ -129,7 +129,7 @@ public class AuthorizationServiceTest {
     }
 
     @Test
-    public void testRefreshAccessToken() {
+    void testRefreshAccessToken() {
         OAuth2AccessTokenResponse tokenResponse = OAuth2AccessTokenResponse
                 .withToken("new-access-token")
                 .tokenType(OAuth2AccessToken.TokenType.BEARER)
@@ -152,7 +152,7 @@ public class AuthorizationServiceTest {
     }
 
     @Test
-    public void testRefreshAccessTokenWithException() {
+    void testRefreshAccessTokenWithException() {
         when(refreshTokenResponseClient.getTokenResponse(any(OAuth2RefreshTokenGrantRequest.class)))
                 .thenThrow(new RuntimeException("Refresh failed"));
 

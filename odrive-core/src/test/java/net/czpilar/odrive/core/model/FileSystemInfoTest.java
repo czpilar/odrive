@@ -4,24 +4,24 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class FileSystemInfoTest {
+class FileSystemInfoTest {
 
     @Test
-    public void testRecordAccessor() {
+    void testRecordAccessor() {
         FileSystemInfo fsi = new FileSystemInfo("2026-03-14T12:00:00Z");
 
         assertEquals("2026-03-14T12:00:00Z", fsi.lastModifiedDateTime());
     }
 
     @Test
-    public void testNullValue() {
+    void testNullValue() {
         FileSystemInfo fsi = new FileSystemInfo(null);
 
         assertNull(fsi.lastModifiedDateTime());
     }
 
     @Test
-    public void testEquality() {
+    void testEquality() {
         FileSystemInfo fsi1 = new FileSystemInfo("2026-03-14T12:00:00Z");
         FileSystemInfo fsi2 = new FileSystemInfo("2026-03-14T12:00:00Z");
 
@@ -30,7 +30,7 @@ public class FileSystemInfoTest {
     }
 
     @Test
-    public void testInequality() {
+    void testInequality() {
         FileSystemInfo fsi1 = new FileSystemInfo("2026-03-14T12:00:00Z");
         FileSystemInfo fsi2 = new FileSystemInfo("2026-03-15T12:00:00Z");
 

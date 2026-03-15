@@ -19,7 +19,7 @@ import java.io.IOException;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-public class BearerAuthInterceptorTest {
+class BearerAuthInterceptorTest {
 
     @Mock
     private HttpRequest request;
@@ -41,7 +41,7 @@ public class BearerAuthInterceptorTest {
     private AutoCloseable autoCloseable;
 
     @BeforeEach
-    public void before() {
+    void before() {
         autoCloseable = MockitoAnnotations.openMocks(this);
         headers = new HttpHeaders();
         when(request.getHeaders()).thenReturn(headers);
@@ -49,12 +49,12 @@ public class BearerAuthInterceptorTest {
     }
 
     @AfterEach
-    public void after() throws Exception {
+    void after() throws Exception {
         autoCloseable.close();
     }
 
     @Test
-    public void testFirstRequestObtainsToken() throws IOException {
+    void testFirstRequestObtainsToken() throws IOException {
         when(credentialLoader.getRefreshToken()).thenReturn("my-refresh-token");
         when(authorizationService.refreshAccessToken("my-refresh-token"))
                 .thenReturn(new Credential("access-token", "new-refresh-token"));
@@ -69,7 +69,7 @@ public class BearerAuthInterceptorTest {
     }
 
     @Test
-    public void testSecondRequestReusesToken() throws IOException {
+    void testSecondRequestReusesToken() throws IOException {
         when(credentialLoader.getRefreshToken()).thenReturn("my-refresh-token");
         when(authorizationService.refreshAccessToken("my-refresh-token"))
                 .thenReturn(new Credential("access-token", "new-refresh-token"));
@@ -84,7 +84,7 @@ public class BearerAuthInterceptorTest {
     }
 
     @Test
-    public void testRefreshesTokenOn401() throws IOException {
+    void testRefreshesTokenOn401() throws IOException {
         when(credentialLoader.getRefreshToken()).thenReturn("my-refresh-token");
         when(authorizationService.refreshAccessToken("my-refresh-token"))
                 .thenReturn(new Credential("old-token", "rt1"))
@@ -102,7 +102,7 @@ public class BearerAuthInterceptorTest {
     }
 
     @Test
-    public void testReturnsNullTokenWhenNoRefreshToken() throws IOException {
+    void testReturnsNullTokenWhenNoRefreshToken() throws IOException {
         when(credentialLoader.getRefreshToken()).thenReturn(null);
         when(execution.execute(request, new byte[0])).thenReturn(response);
 

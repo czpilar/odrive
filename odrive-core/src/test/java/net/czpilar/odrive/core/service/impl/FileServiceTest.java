@@ -21,7 +21,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-public class FileServiceTest {
+class FileServiceTest {
 
     private final FileService service = new FileService(3);
 
@@ -45,7 +45,7 @@ public class FileServiceTest {
     private MockedStatic<EqualUtils> equalUtilsMockedStatic;
 
     @BeforeEach
-    public void before() {
+    void before() {
         autoCloseable = MockitoAnnotations.openMocks(this);
         service.setApplicationContext(applicationContext);
         service.setODriveCredential(oDriveCredential);
@@ -58,13 +58,13 @@ public class FileServiceTest {
     }
 
     @AfterEach
-    public void after() throws Exception {
+    void after() throws Exception {
         autoCloseable.close();
         equalUtilsMockedStatic.close();
     }
 
     @Test
-    public void testGetDirectoryService() {
+    void testGetDirectoryService() {
         IDirectoryService result = service.getDirectoryService();
 
         assertNotNull(result);
@@ -72,7 +72,7 @@ public class FileServiceTest {
     }
 
     @Test
-    public void testGetUploadDir() {
+    void testGetUploadDir() {
         String uploadDirName = "test-upload-dir";
 
         String result = service.getUploadDir(uploadDirName);
@@ -84,7 +84,7 @@ public class FileServiceTest {
     }
 
     @Test
-    public void testGetUploadDirWithNullUploadDir() {
+    void testGetUploadDirWithNullUploadDir() {
         String uploadDirName = "test-default-upload-dir";
 
         when(oDriveCredential.getUploadDir()).thenReturn(uploadDirName);
@@ -100,7 +100,7 @@ public class FileServiceTest {
     }
 
     @Test
-    public void testUploadFilesWithNullFilenames() {
+    void testUploadFilesWithNullFilenames() {
         DriveItem parent = mock(DriveItem.class);
 
         List<DriveItem> result = service.uploadFiles(null, parent);
@@ -110,7 +110,7 @@ public class FileServiceTest {
     }
 
     @Test
-    public void testUploadFilesWithEmptyListOfFilenames() {
+    void testUploadFilesWithEmptyListOfFilenames() {
         DriveItem parent = mock(DriveItem.class);
 
         List<DriveItem> result = service.uploadFiles(List.of(), parent);
@@ -120,7 +120,7 @@ public class FileServiceTest {
     }
 
     @Test
-    public void testUploadFilesWhereUploadFileThrowsException() {
+    void testUploadFilesWhereUploadFileThrowsException() {
         DriveItem parent = mock(DriveItem.class);
 
         when(serviceMock.uploadFiles(anyList(), any(DriveItem.class))).thenCallRealMethod();
@@ -139,7 +139,7 @@ public class FileServiceTest {
     }
 
     @Test
-    public void testUploadFilesWithListOfFilenames() {
+    void testUploadFilesWithListOfFilenames() {
         DriveItem parent = mock(DriveItem.class);
 
         when(serviceMock.uploadFiles(anyList(), any(DriveItem.class))).thenCallRealMethod();
@@ -162,7 +162,7 @@ public class FileServiceTest {
     }
 
     @Test
-    public void testUploadFileWithStringFilenameAndStringParentDir() {
+    void testUploadFileWithStringFilenameAndStringParentDir() {
         String pathname = "test-parent-dir";
         String filename = "test-filename";
         DriveItem file = mock(DriveItem.class);
@@ -191,7 +191,7 @@ public class FileServiceTest {
     }
 
     @Test
-    public void testUploadFileWithStringFilename() {
+    void testUploadFileWithStringFilename() {
         String filename = "test-filename";
         DriveItem file = mock(DriveItem.class);
 
@@ -211,7 +211,7 @@ public class FileServiceTest {
     }
 
     @Test
-    public void testUploadFilesWithStringFilenames() {
+    void testUploadFilesWithStringFilenames() {
         List<String> filenames = Arrays.asList("test-filename1", "test-filename2");
         DriveItem file1 = mock(DriveItem.class);
         DriveItem file2 = mock(DriveItem.class);
@@ -235,7 +235,7 @@ public class FileServiceTest {
     }
 
     @Test
-    public void testUploadFilesWithStringFilenamesAndStringParentDir() {
+    void testUploadFilesWithStringFilenamesAndStringParentDir() {
         String parentDir = "test-parent-dir";
         List<String> filenames = Arrays.asList("test-filename1", "test-filename2");
         DriveItem file1 = mock(DriveItem.class);

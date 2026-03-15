@@ -6,10 +6,10 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class ODriveSettingTest {
+class ODriveSettingTest {
 
     @Test
-    public void testODriveSetting() {
+    void testODriveSetting() {
         String applicationVersion = "test-application-version";
         String clientId = "test-client-id";
         String tenant = "test-tenant";

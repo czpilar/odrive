@@ -6,10 +6,10 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class CreateFolderRequestTest {
+class CreateFolderRequestTest {
 
     @Test
-    public void testConvenienceConstructor() {
+    void testConvenienceConstructor() {
         CreateFolderRequest request = new CreateFolderRequest("TestFolder");
 
         assertEquals("TestFolder", request.name());
@@ -18,7 +18,7 @@ public class CreateFolderRequestTest {
     }
 
     @Test
-    public void testFullConstructor() {
+    void testFullConstructor() {
         Map<String, Object> folder = Map.of("key", "value");
         CreateFolderRequest request = new CreateFolderRequest("MyFolder", folder);
 
@@ -28,14 +28,14 @@ public class CreateFolderRequestTest {
     }
 
     @Test
-    public void testConvenienceConstructorReturnsEmptyMap() {
+    void testConvenienceConstructorReturnsEmptyMap() {
         CreateFolderRequest request = new CreateFolderRequest("Folder");
 
         assertEquals(Map.of(), request.folder());
     }
 
     @Test
-    public void testRecordEquality() {
+    void testRecordEquality() {
         CreateFolderRequest request1 = new CreateFolderRequest("Folder", Map.of());
         CreateFolderRequest request2 = new CreateFolderRequest("Folder");
 
@@ -44,7 +44,7 @@ public class CreateFolderRequestTest {
     }
 
     @Test
-    public void testRecordToString() {
+    void testRecordToString() {
         CreateFolderRequest request = new CreateFolderRequest("TestFolder");
 
         String str = request.toString();
@@ -52,7 +52,7 @@ public class CreateFolderRequestTest {
     }
 
     @Test
-    public void testRecordInequality() {
+    void testRecordInequality() {
         CreateFolderRequest request1 = new CreateFolderRequest("Folder1");
         CreateFolderRequest request2 = new CreateFolderRequest("Folder2");
 

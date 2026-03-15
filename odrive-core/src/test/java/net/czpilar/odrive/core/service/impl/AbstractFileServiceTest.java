@@ -13,7 +13,7 @@ import org.mockito.MockitoAnnotations;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-public class AbstractFileServiceTest {
+class AbstractFileServiceTest {
 
     @Mock
     private AbstractFileService service;
@@ -24,19 +24,19 @@ public class AbstractFileServiceTest {
     private AutoCloseable autoCloseable;
 
     @BeforeEach
-    public void before() {
+    void before() {
         autoCloseable = MockitoAnnotations.openMocks(this);
 
         when(service.getOneDriveClient()).thenReturn(oneDriveClient);
     }
 
     @AfterEach
-    public void after() throws Exception {
+    void after() throws Exception {
         autoCloseable.close();
     }
 
     @Test
-    public void testGetPathWhereFilenameIsNullAndParentIsNull() {
+    void testGetPathWhereFilenameIsNullAndParentIsNull() {
         when(service.getPath(any(), any())).thenCallRealMethod();
 
         assertThrows(IllegalArgumentException.class, () -> service.getPath(null, null));
@@ -46,7 +46,7 @@ public class AbstractFileServiceTest {
     }
 
     @Test
-    public void testGetPathWhereParentIsNull() {
+    void testGetPathWhereParentIsNull() {
         String filename = "test-filename";
         when(service.getPath(anyString(), any())).thenCallRealMethod();
 
@@ -60,7 +60,7 @@ public class AbstractFileServiceTest {
     }
 
     @Test
-    public void testGetPathWhereParentExists() {
+    void testGetPathWhereParentExists() {
         String filename = "test-filename";
         DriveItem parent = mock(DriveItem.class);
         when(service.getPath(anyString(), any(DriveItem.class))).thenCallRealMethod();
@@ -79,7 +79,7 @@ public class AbstractFileServiceTest {
     }
 
     @Test
-    public void testGetPathWhereFilenameStartsWithSlash() {
+    void testGetPathWhereFilenameStartsWithSlash() {
         String filename = "/test-filename";
         when(service.getPath(anyString(), any())).thenCallRealMethod();
 
@@ -93,7 +93,7 @@ public class AbstractFileServiceTest {
     }
 
     @Test
-    public void testFindFolderWhereEntryIsFolder() {
+    void testFindFolderWhereEntryIsFolder() {
         String filename = "test-folder";
         DriveItem parent = mock(DriveItem.class);
         DriveItem folder = mock(DriveItem.class);
@@ -110,7 +110,7 @@ public class AbstractFileServiceTest {
     }
 
     @Test
-    public void testFindFolderWhereEntryIsFile() {
+    void testFindFolderWhereEntryIsFile() {
         String filename = "test-file";
         DriveItem parent = mock(DriveItem.class);
         DriveItem file = mock(DriveItem.class);
@@ -126,7 +126,7 @@ public class AbstractFileServiceTest {
     }
 
     @Test
-    public void testFindFolderWhereEntryIsNull() {
+    void testFindFolderWhereEntryIsNull() {
         String filename = "test-folder";
         DriveItem parent = mock(DriveItem.class);
 
@@ -140,7 +140,7 @@ public class AbstractFileServiceTest {
     }
 
     @Test
-    public void testFindFileWhereEntryIsFile() {
+    void testFindFileWhereEntryIsFile() {
         String filename = "test-file";
         DriveItem parent = mock(DriveItem.class);
         DriveItem file = mock(DriveItem.class);
@@ -157,7 +157,7 @@ public class AbstractFileServiceTest {
     }
 
     @Test
-    public void testFindFileWhereEntryIsFolder() {
+    void testFindFileWhereEntryIsFolder() {
         String filename = "test-folder";
         DriveItem parent = mock(DriveItem.class);
         DriveItem folder = mock(DriveItem.class);
@@ -173,7 +173,7 @@ public class AbstractFileServiceTest {
     }
 
     @Test
-    public void testFindFileWhereExceptionThrown() {
+    void testFindFileWhereExceptionThrown() {
         String filename = "test-file";
         DriveItem parent = mock(DriveItem.class);
 

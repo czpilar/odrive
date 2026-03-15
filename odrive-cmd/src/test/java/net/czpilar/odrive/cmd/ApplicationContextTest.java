@@ -11,7 +11,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
  */
 @ExtendWith(SpringExtension.class)
 @Import(ODriveCmdContext.class)
-public class ApplicationContextTest {
+class ApplicationContextTest {
 
     @Test
     void test() {

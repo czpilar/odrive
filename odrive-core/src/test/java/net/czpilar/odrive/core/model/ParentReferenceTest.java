@@ -4,10 +4,10 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class ParentReferenceTest {
+class ParentReferenceTest {
 
     @Test
-    public void testRecordAccessors() {
+    void testRecordAccessors() {
         ParentReference ref = new ParentReference("parent-id-123", "/drive/root:/Documents");
 
         assertEquals("parent-id-123", ref.id());
@@ -15,7 +15,7 @@ public class ParentReferenceTest {
     }
 
     @Test
-    public void testNullValues() {
+    void testNullValues() {
         ParentReference ref = new ParentReference(null, null);
 
         assertNull(ref.id());
@@ -23,7 +23,7 @@ public class ParentReferenceTest {
     }
 
     @Test
-    public void testEquality() {
+    void testEquality() {
         ParentReference ref1 = new ParentReference("id", "/path");
         ParentReference ref2 = new ParentReference("id", "/path");
 
@@ -32,7 +32,7 @@ public class ParentReferenceTest {
     }
 
     @Test
-    public void testInequality() {
+    void testInequality() {
         ParentReference ref1 = new ParentReference("id1", "/path1");
         ParentReference ref2 = new ParentReference("id2", "/path2");
 

@@ -4,38 +4,38 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class DriveItemTest {
+class DriveItemTest {
 
     @Test
-    public void testIsFolderWhenFolderIsNotNull() {
+    void testIsFolderWhenFolderIsNotNull() {
         DriveItem item = new DriveItem(null, null, null, null, new Object(), null, null, null);
 
         assertTrue(item.isFolder());
     }
 
     @Test
-    public void testIsFolderWhenFolderIsNull() {
+    void testIsFolderWhenFolderIsNull() {
         DriveItem item = new DriveItem(null, null, null, null, null, null, null, null);
 
         assertFalse(item.isFolder());
     }
 
     @Test
-    public void testIsFileWhenFileIsNotNull() {
+    void testIsFileWhenFileIsNotNull() {
         DriveItem item = new DriveItem(null, null, null, null, null, new Object(), null, null);
 
         assertTrue(item.isFile());
     }
 
     @Test
-    public void testIsFileWhenFileIsNull() {
+    void testIsFileWhenFileIsNull() {
         DriveItem item = new DriveItem(null, null, null, null, null, null, null, null);
 
         assertFalse(item.isFile());
     }
 
     @Test
-    public void testGetPathDisplayWithParentPathAndName() {
+    void testGetPathDisplayWithParentPathAndName() {
         ParentReference ref = new ParentReference(null, "/drive/root:/Documents/Subfolder");
         DriveItem item = new DriveItem(null, "myfile.txt", null, null, null, null, ref, null);
 
@@ -43,7 +43,7 @@ public class DriveItemTest {
     }
 
     @Test
-    public void testGetPathDisplayWithRootParentPath() {
+    void testGetPathDisplayWithRootParentPath() {
         ParentReference ref = new ParentReference(null, "/drive/root:");
         DriveItem item = new DriveItem(null, "myfile.txt", null, null, null, null, ref, null);
 
@@ -51,7 +51,7 @@ public class DriveItemTest {
     }
 
     @Test
-    public void testGetPathDisplayWithSlashAfterColon() {
+    void testGetPathDisplayWithSlashAfterColon() {
         ParentReference ref = new ParentReference(null, "/drive/root:/");
         DriveItem item = new DriveItem(null, "myfile.txt", null, null, null, null, ref, null);
 
@@ -59,7 +59,7 @@ public class DriveItemTest {
     }
 
     @Test
-    public void testGetPathDisplayWithNullName() {
+    void testGetPathDisplayWithNullName() {
         ParentReference ref = new ParentReference(null, "/drive/root:/Documents");
         DriveItem item = new DriveItem(null, null, null, null, null, null, ref, null);
 
@@ -67,14 +67,14 @@ public class DriveItemTest {
     }
 
     @Test
-    public void testGetPathDisplayWithNullParentReference() {
+    void testGetPathDisplayWithNullParentReference() {
         DriveItem item = new DriveItem(null, "myfile.txt", null, null, null, null, null, null);
 
         assertEquals("/myfile.txt", item.getPathDisplay());
     }
 
     @Test
-    public void testGetPathDisplayWithNullParentPath() {
+    void testGetPathDisplayWithNullParentPath() {
         ParentReference ref = new ParentReference(null, null);
         DriveItem item = new DriveItem(null, "myfile.txt", null, null, null, null, ref, null);
 
@@ -82,14 +82,14 @@ public class DriveItemTest {
     }
 
     @Test
-    public void testGetPathDisplayWithNullParentReferenceAndNullName() {
+    void testGetPathDisplayWithNullParentReferenceAndNullName() {
         DriveItem item = new DriveItem(null, null, null, null, null, null, null, null);
 
         assertEquals("", item.getPathDisplay());
     }
 
     @Test
-    public void testGetPathDisplayWithPathNotContainingColon() {
+    void testGetPathDisplayWithPathNotContainingColon() {
         ParentReference ref = new ParentReference(null, "no-colon-path");
         DriveItem item = new DriveItem(null, "myfile.txt", null, null, null, null, ref, null);
 
@@ -98,7 +98,7 @@ public class DriveItemTest {
     }
 
     @Test
-    public void testRecordAccessors() {
+    void testRecordAccessors() {
         Object folder = new Object();
         Object file = new Object();
         ParentReference ref = new ParentReference("ref-id", "/path");

@@ -14,7 +14,7 @@ import java.util.Properties;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-public class PropertiesODriveCredentialTest {
+class PropertiesODriveCredentialTest {
 
     private PropertiesODriveCredential oDrivePropertiesNotExist;
     private PropertiesODriveCredential oDrivePropertiesExist;
@@ -23,7 +23,7 @@ public class PropertiesODriveCredentialTest {
     private File propertiesExist;
 
     @BeforeEach
-    public void before() throws IOException {
+    void before() throws IOException {
         String tempDir = System.getProperty("java.io.tmpdir");
         propertiesNotExist = new File(tempDir + "test-properties-not-exist-file-" + System.currentTimeMillis() + ".properties");
         propertiesExist = new File(tempDir + "test-properties-exist-file-" + System.currentTimeMillis() + ".properties");
@@ -42,7 +42,7 @@ public class PropertiesODriveCredentialTest {
     }
 
     @AfterEach
-    public void after() throws IOException {
+    void after() throws IOException {
         deleteIfExist(propertiesNotExist);
         deleteIfExist(propertiesExist);
     }
@@ -60,17 +60,17 @@ public class PropertiesODriveCredentialTest {
     }
 
     @Test
-    public void testGetRefreshTokenWherePropertiesExist() {
+    void testGetRefreshTokenWherePropertiesExist() {
         assertEquals("test-refresh-token", oDrivePropertiesExist.getRefreshToken());
     }
 
     @Test
-    public void testGetRefreshTokenWherePropertiesNotExist() {
+    void testGetRefreshTokenWherePropertiesNotExist() {
         assertNull(oDrivePropertiesNotExist.getRefreshToken());
     }
 
     @Test
-    public void testSaveRefreshToken() {
+    void testSaveRefreshToken() {
         oDrivePropertiesNotExist.saveRefreshToken("new-refresh-token-to-save");
 
         PropertiesODriveCredential oDrivePropertiesInTest = createODriveCredential(propertiesNotExist.getPath());
@@ -79,7 +79,7 @@ public class PropertiesODriveCredentialTest {
     }
 
     @Test
-    public void testSaveRefreshTokenDoesNotSaveNull() {
+    void testSaveRefreshTokenDoesNotSaveNull() {
         oDrivePropertiesNotExist.saveRefreshToken(null);
 
         PropertiesODriveCredential oDrivePropertiesInTest = createODriveCredential(propertiesNotExist.getPath());
@@ -88,17 +88,17 @@ public class PropertiesODriveCredentialTest {
     }
 
     @Test
-    public void testGetUploadDirWherePropertiesNotExist() {
+    void testGetUploadDirWherePropertiesNotExist() {
         assertEquals(ODriveCmdContext.DEFAULT_UPLOAD_DIR, oDrivePropertiesNotExist.getUploadDir());
     }
 
     @Test
-    public void testGetUploadDirWherePropertiesExist() {
+    void testGetUploadDirWherePropertiesExist() {
         assertEquals("test-upload-dir", oDrivePropertiesExist.getUploadDir());
     }
 
     @Test
-    public void testSetUploadDir() {
+    void testSetUploadDir() {
         oDrivePropertiesNotExist.setUploadDir("new-upload-dir");
         assertEquals("new-upload-dir", oDrivePropertiesNotExist.getUploadDir());
     }

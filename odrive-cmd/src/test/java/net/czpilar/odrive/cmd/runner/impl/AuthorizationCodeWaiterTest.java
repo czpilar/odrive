@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class AuthorizationCodeWaiterTest {
+class AuthorizationCodeWaiterTest {
 
     private static final AtomicInteger PORT_COUNTER = new AtomicInteger(19780);
     private static final String TEST_CONTEXT = "/odrive-test";
@@ -50,7 +50,7 @@ public class AuthorizationCodeWaiterTest {
     }
 
     @Test
-    public void testGetCodeWithValidAuthorizationCode() throws Exception {
+    void testGetCodeWithValidAuthorizationCode() throws Exception {
         int port = PORT_COUNTER.getAndIncrement();
         String authCode = "test-auth-code-12345";
         AuthorizationCodeWaiter waiter = createWaiter(port);
@@ -77,7 +77,7 @@ public class AuthorizationCodeWaiterTest {
     }
 
     @Test
-    public void testGetCodeWithMultipleQueryParams() throws Exception {
+    void testGetCodeWithMultipleQueryParams() throws Exception {
         int port = PORT_COUNTER.getAndIncrement();
         String authCode = "multi-param-code";
         AuthorizationCodeWaiter waiter = createWaiter(port);
@@ -104,7 +104,7 @@ public class AuthorizationCodeWaiterTest {
     }
 
     @Test
-    public void testGetCodeResponseContainsHtmlContent() throws Exception {
+    void testGetCodeResponseContainsHtmlContent() throws Exception {
         int port = PORT_COUNTER.getAndIncrement();
         AuthorizationCodeWaiter waiter = createWaiter(port);
 

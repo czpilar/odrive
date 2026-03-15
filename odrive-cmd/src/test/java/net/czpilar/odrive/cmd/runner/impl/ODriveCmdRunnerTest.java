@@ -21,7 +21,7 @@ import java.util.Optional;
 
 import static org.mockito.Mockito.*;
 
-public class ODriveCmdRunnerTest {
+class ODriveCmdRunnerTest {
 
     private final ODriveCmdRunner runner = new ODriveCmdRunner();
 
@@ -47,7 +47,7 @@ public class ODriveCmdRunnerTest {
     private AutoCloseable autoCloseable;
 
     @BeforeEach
-    public void before() {
+    void before() {
         autoCloseable = MockitoAnnotations.openMocks(this);
         runner.setCommandLineParser(commandLineParser);
         runner.setOptions(options);
@@ -60,7 +60,7 @@ public class ODriveCmdRunnerTest {
     }
 
     @AfterEach
-    public void after() throws Exception {
+    void after() throws Exception {
         autoCloseable.close();
     }
 
@@ -69,7 +69,7 @@ public class ODriveCmdRunnerTest {
     }
 
     @Test
-    public void testRunWhereCommandLineParsingFails() throws ParseException, IOException {
+    void testRunWhereCommandLineParsingFails() throws ParseException, IOException {
         String appName = "application-name";
         String[] args = {"arg1", "arg2"};
         when(commandLineParser.parse(any(Options.class), any(String[].class))).thenThrow(ParseException.class);
@@ -94,7 +94,7 @@ public class ODriveCmdRunnerTest {
     }
 
     @Test
-    public void testRunWhereCommandLineHasEmptyOptions() throws ParseException, IOException {
+    void testRunWhereCommandLineHasEmptyOptions() throws ParseException, IOException {
         String appName = "application-name";
         String[] args = {"arg1", "arg2"};
         Option[] optionList = {};
@@ -122,7 +122,7 @@ public class ODriveCmdRunnerTest {
     }
 
     @Test
-    public void testRunWhereCommandLineHasOnlyPropertiesOption() throws ParseException, IOException {
+    void testRunWhereCommandLineHasOnlyPropertiesOption() throws ParseException, IOException {
         String appName = "application-name";
         String[] args = {"arg1", "arg2"};
         Option[] optionList = {Option.builder("p").build()};
@@ -152,7 +152,7 @@ public class ODriveCmdRunnerTest {
     }
 
     @Test
-    public void testRunWhereCommandLineHasPropertiesAndVersionOptions() throws ParseException {
+    void testRunWhereCommandLineHasPropertiesAndVersionOptions() throws ParseException {
         String appVersion = "application-version";
         String propertiesValue = "test-properties-value";
         String[] args = {"arg1", "arg2"};
@@ -195,7 +195,7 @@ public class ODriveCmdRunnerTest {
     }
 
     @Test
-    public void testRunWhereCommandLineHasPropertiesAndHelpOptions() throws ParseException, IOException {
+    void testRunWhereCommandLineHasPropertiesAndHelpOptions() throws ParseException, IOException {
         String appName = "application-name";
         String propertiesValue = "test-properties-value";
         String[] args = {"arg1", "arg2"};
@@ -239,7 +239,7 @@ public class ODriveCmdRunnerTest {
     }
 
     @Test
-    public void testRunWhereCommandLineHasPropertiesAndLinkOptions() throws ParseException {
+    void testRunWhereCommandLineHasPropertiesAndLinkOptions() throws ParseException {
         String propertiesValue = "test-properties-value";
         String[] args = {"arg1", "arg2"};
         Option[] optionList = {Option.builder("p").build(), Option.builder("l").build()};
@@ -281,7 +281,7 @@ public class ODriveCmdRunnerTest {
     }
 
     @Test
-    public void testRunWhereCommandLineHasPropertiesAndAuthorizationOptionsAndReturnNullCredential() throws ParseException {
+    void testRunWhereCommandLineHasPropertiesAndAuthorizationOptionsAndReturnNullCredential() throws ParseException {
         String propertiesValue = "test-properties-value";
         String authorizationValue = "test-authorization-value";
         String[] args = {"arg1", "arg2"};
@@ -326,7 +326,7 @@ public class ODriveCmdRunnerTest {
     }
 
     @Test
-    public void testRunWhereCommandLineHasPropertiesAndAuthorizationOptionsAndReturnCredential() throws ParseException {
+    void testRunWhereCommandLineHasPropertiesAndAuthorizationOptionsAndReturnCredential() throws ParseException {
         String propertiesValue = "test-properties-value";
         String authorizationValue = "test-authorization-value";
         String[] args = {"arg1", "arg2"};
@@ -371,7 +371,7 @@ public class ODriveCmdRunnerTest {
     }
 
     @Test
-    public void testRunWhereCommandLineHasPropertiesAndAuthorizationOptionsNoValueAndReturnCredential() throws ParseException {
+    void testRunWhereCommandLineHasPropertiesAndAuthorizationOptionsNoValueAndReturnCredential() throws ParseException {
         String propertiesValue = "test-properties-value";
         String authorizationValue = "test-authorization-value";
         String[] args = {"arg1", "arg2"};
@@ -418,7 +418,7 @@ public class ODriveCmdRunnerTest {
     }
 
     @Test
-    public void testRunWhereCommandLineHasPropertiesAndFileOptionsAndNoDirectory() throws ParseException {
+    void testRunWhereCommandLineHasPropertiesAndFileOptionsAndNoDirectory() throws ParseException {
         String propertiesValue = "test-properties-value";
         String optionFile = "test-file-value";
         List<String> optionFiles = List.of(optionFile);
@@ -465,7 +465,7 @@ public class ODriveCmdRunnerTest {
     }
 
     @Test
-    public void testRunWhereCommandLineHasPropertiesAndFileOptionsAndDirectory() throws ParseException {
+    void testRunWhereCommandLineHasPropertiesAndFileOptionsAndDirectory() throws ParseException {
         String propertiesValue = "test-properties-value";
         String optionFile = "test-file-value";
         String optionDirectory = "test-directory";

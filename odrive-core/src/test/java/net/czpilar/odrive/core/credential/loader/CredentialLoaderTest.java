@@ -11,7 +11,7 @@ import org.mockito.MockitoAnnotations;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-public class CredentialLoaderTest {
+class CredentialLoaderTest {
 
     private CredentialLoader loader;
 
@@ -21,23 +21,23 @@ public class CredentialLoaderTest {
     private AutoCloseable autoCloseable;
 
     @BeforeEach
-    public void before() {
+    void before() {
         autoCloseable = MockitoAnnotations.openMocks(this);
         loader = new CredentialLoader(oDriveCredential);
     }
 
     @AfterEach
-    public void after() throws Exception {
+    void after() throws Exception {
         autoCloseable.close();
     }
 
     @Test
-    public void testConstructorWithNullCredential() {
+    void testConstructorWithNullCredential() {
         assertThrows(NoCredentialFoundException.class, () -> new CredentialLoader(null));
     }
 
     @Test
-    public void testGetRefreshToken() {
+    void testGetRefreshToken() {
         when(oDriveCredential.getRefreshToken()).thenReturn("test-refresh-token");
 
         String result = loader.getRefreshToken();
@@ -49,7 +49,7 @@ public class CredentialLoaderTest {
     }
 
     @Test
-    public void testGetRefreshTokenReturnsNull() {
+    void testGetRefreshTokenReturnsNull() {
         when(oDriveCredential.getRefreshToken()).thenReturn(null);
 
         String result = loader.getRefreshToken();

@@ -12,7 +12,7 @@ import org.springframework.context.ApplicationContext;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-public class AbstractServiceTest {
+class AbstractServiceTest {
 
     private AbstractService service;
 
@@ -28,7 +28,7 @@ public class AbstractServiceTest {
     private AutoCloseable autoCloseable;
 
     @BeforeEach
-    public void before() {
+    void before() {
         autoCloseable = MockitoAnnotations.openMocks(this);
         service = new AbstractService() {
         };
@@ -38,12 +38,12 @@ public class AbstractServiceTest {
     }
 
     @AfterEach
-    public void after() throws Exception {
+    void after() throws Exception {
         autoCloseable.close();
     }
 
     @Test
-    public void testSetAndGetODriveCredential() {
+    void testSetAndGetODriveCredential() {
         assertNull(service.getODriveCredential());
 
         service.setODriveCredential(oDriveCredential);
@@ -52,7 +52,7 @@ public class AbstractServiceTest {
     }
 
     @Test
-    public void testGetOneDriveClient() {
+    void testGetOneDriveClient() {
         OneDriveClient result = service.getOneDriveClient();
 
         assertNotNull(result);

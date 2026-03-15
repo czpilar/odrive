@@ -4,10 +4,10 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class AbstractODriveCredentialTest {
+class AbstractODriveCredentialTest {
 
     @Test
-    public void testAbstractODriveCredentialIsAbstract() {
+    void testAbstractODriveCredentialIsAbstract() {
         AbstractODriveCredential credential = new AbstractODriveCredential() {
             @Override
             public String getRefreshToken() {

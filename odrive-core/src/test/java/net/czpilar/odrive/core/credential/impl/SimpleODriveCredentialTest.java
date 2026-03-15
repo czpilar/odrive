@@ -6,29 +6,29 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-public class SimpleODriveCredentialTest {
+class SimpleODriveCredentialTest {
 
     private SimpleODriveCredential credential;
 
     @BeforeEach
-    public void before() {
+    void before() {
         credential = new SimpleODriveCredential();
     }
 
     @Test
-    public void testGetRefreshTokenReturnsNull() {
+    void testGetRefreshTokenReturnsNull() {
         assertNull(credential.getRefreshToken());
     }
 
     @Test
-    public void testSaveAndGetRefreshToken() {
+    void testSaveAndGetRefreshToken() {
         credential.saveRefreshToken("test-refresh-token");
 
         assertEquals("test-refresh-token", credential.getRefreshToken());
     }
 
     @Test
-    public void testSetAndGetUploadDir() {
+    void testSetAndGetUploadDir() {
         assertNull(credential.getUploadDir());
 
         String uploadDir = "test-upload-dir";

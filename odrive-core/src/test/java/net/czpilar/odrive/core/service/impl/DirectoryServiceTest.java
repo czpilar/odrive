@@ -13,7 +13,7 @@ import org.mockito.MockitoAnnotations;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-public class DirectoryServiceTest {
+class DirectoryServiceTest {
 
     private final DirectoryService service = new DirectoryService();
 
@@ -26,19 +26,19 @@ public class DirectoryServiceTest {
     private AutoCloseable autoCloseable;
 
     @BeforeEach
-    public void before() {
+    void before() {
         autoCloseable = MockitoAnnotations.openMocks(this);
 
         when(serviceMock.getOneDriveClient()).thenReturn(oneDriveClient);
     }
 
     @AfterEach
-    public void after() throws Exception {
+    void after() throws Exception {
         autoCloseable.close();
     }
 
     @Test
-    public void testCreateOneDirectoryWhereParentDirIsNull() {
+    void testCreateOneDirectoryWhereParentDirIsNull() {
         String dirname = "test-dirname";
         DriveItem directory = mock(DriveItem.class);
 
@@ -60,7 +60,7 @@ public class DirectoryServiceTest {
     }
 
     @Test
-    public void testCreateOneDirectoryWhereParentDirExists() {
+    void testCreateOneDirectoryWhereParentDirExists() {
         String dirname = "test-dirname";
         DriveItem parentDir = mock(DriveItem.class);
         DriveItem directory = mock(DriveItem.class);
@@ -86,7 +86,7 @@ public class DirectoryServiceTest {
     }
 
     @Test
-    public void testCreateOneDirectoryWhereExceptionWasThrown() {
+    void testCreateOneDirectoryWhereExceptionWasThrown() {
         String dirname = "test-dirname";
 
         when(serviceMock.createOneDirectory(anyString(), any())).thenCallRealMethod();
@@ -103,7 +103,7 @@ public class DirectoryServiceTest {
     }
 
     @Test
-    public void testFindOrCreateOneDirectoryWhereDirectoryIsFound() {
+    void testFindOrCreateOneDirectoryWhereDirectoryIsFound() {
         DriveItem parentDir = mock(DriveItem.class);
         DriveItem directory = mock(DriveItem.class);
         String dirname = "test-dirname";
@@ -126,7 +126,7 @@ public class DirectoryServiceTest {
     }
 
     @Test
-    public void testFindOrCreateOneDirectoryWhereDirectoryIsCreated() {
+    void testFindOrCreateOneDirectoryWhereDirectoryIsCreated() {
         DriveItem parentDir = mock(DriveItem.class);
         DriveItem directory = mock(DriveItem.class);
         String dirname = "test-dirname";
@@ -151,7 +151,7 @@ public class DirectoryServiceTest {
     }
 
     @Test
-    public void testFindDirectoryWithPathname() {
+    void testFindDirectoryWithPathname() {
         String pathname = "test-pathname";
         DriveItem directory = mock(DriveItem.class);
 
@@ -170,7 +170,7 @@ public class DirectoryServiceTest {
     }
 
     @Test
-    public void testFindDirectoryWithPathnameAndParentWhereDirnameIsNull() {
+    void testFindDirectoryWithPathnameAndParentWhereDirnameIsNull() {
         when(serviceMock.findDirectory(any(), any(DriveItem.class))).thenCallRealMethod();
 
         DriveItem result = serviceMock.findDirectory(null, null);
@@ -183,7 +183,7 @@ public class DirectoryServiceTest {
     }
 
     @Test
-    public void testFindDirectoryWithPathnameAndParentWherePathnameHasMoreDirsButCurrentDirIsNull() {
+    void testFindDirectoryWithPathnameAndParentWherePathnameHasMoreDirsButCurrentDirIsNull() {
         String dirname1 = "test-dirname1";
         String dirname2 = "test-dirname2";
         String pathname = dirname1 + "/" + dirname2;
@@ -205,7 +205,7 @@ public class DirectoryServiceTest {
     }
 
     @Test
-    public void testFindDirectoryWithPathnameAndParentWherePathnameHasOneDir() {
+    void testFindDirectoryWithPathnameAndParentWherePathnameHasOneDir() {
         String pathname = "test-dirname";
         DriveItem parentDir = mock(DriveItem.class);
         DriveItem directory = mock(DriveItem.class);
@@ -228,7 +228,7 @@ public class DirectoryServiceTest {
     }
 
     @Test
-    public void testFindDirectoryWithPathnameAndParentWherePathnameHasMoreDirs() {
+    void testFindDirectoryWithPathnameAndParentWherePathnameHasMoreDirs() {
         String dirname1 = "test-dirname1";
         String dirname2 = "test-dirname2";
         String dirname3 = "test-dirname3";
@@ -262,7 +262,7 @@ public class DirectoryServiceTest {
     }
 
     @Test
-    public void testFindOrCreateDirectoryWithPathname() {
+    void testFindOrCreateDirectoryWithPathname() {
         String pathname = "test-pathname";
         DriveItem directory = mock(DriveItem.class);
 
@@ -281,7 +281,7 @@ public class DirectoryServiceTest {
     }
 
     @Test
-    public void testFindOrCreateDirectoryWithPathnameAndParentWhereDirnameIsNull() {
+    void testFindOrCreateDirectoryWithPathnameAndParentWhereDirnameIsNull() {
         when(serviceMock.findOrCreateDirectory(any(), any(DriveItem.class))).thenCallRealMethod();
 
         DriveItem result = serviceMock.findOrCreateDirectory(null, null);
@@ -294,7 +294,7 @@ public class DirectoryServiceTest {
     }
 
     @Test
-    public void testFindOrCreateDirectoryWithPathnameAndParentWherePathnameHasOneDir() {
+    void testFindOrCreateDirectoryWithPathnameAndParentWherePathnameHasOneDir() {
         String pathname = "test-dirname";
         DriveItem parentDir = mock(DriveItem.class);
         DriveItem directory = mock(DriveItem.class);
@@ -317,7 +317,7 @@ public class DirectoryServiceTest {
     }
 
     @Test
-    public void testFindOrCreateDirectoryWithPathnameAndParentWherePathnameHasMoreDirs() {
+    void testFindOrCreateDirectoryWithPathnameAndParentWherePathnameHasMoreDirs() {
         String dirname1 = "test-dirname1";
         String dirname2 = "test-dirname2";
         String dirname3 = "test-dirname3";

@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-public class FileRequestTest {
+class FileRequestTest {
 
     @Mock
     private OneDriveClient client;
@@ -33,12 +33,12 @@ public class FileRequestTest {
     private AutoCloseable autoCloseable;
 
     @BeforeEach
-    public void before() {
+    void before() {
         autoCloseable = MockitoAnnotations.openMocks(this);
     }
 
     @AfterEach
-    public void after() throws Exception {
+    void after() throws Exception {
         autoCloseable.close();
     }
 
@@ -52,7 +52,7 @@ public class FileRequestTest {
 
 
     @Test
-    public void testExecuteSmallFile(@TempDir Path tempDir) throws IOException {
+    void testExecuteSmallFile(@TempDir Path tempDir) throws IOException {
         File localFile = tempDir.resolve("small.txt").toFile();
         Files.writeString(localFile.toPath(), "small file content");
 
@@ -74,7 +74,7 @@ public class FileRequestTest {
     }
 
     @Test
-    public void testExecuteSmallFileWithoutProgressListener(@TempDir Path tempDir) throws IOException {
+    void testExecuteSmallFileWithoutProgressListener(@TempDir Path tempDir) throws IOException {
         File localFile = tempDir.resolve("small.txt").toFile();
         Files.writeString(localFile.toPath(), "small file content");
 
@@ -91,7 +91,7 @@ public class FileRequestTest {
 
 
     @Test
-    public void testExecuteChunkedUpload(@TempDir Path tempDir) throws IOException {
+    void testExecuteChunkedUpload(@TempDir Path tempDir) throws IOException {
         // Create file larger than SMALL_FILE_LIMIT (4 MB)
         File localFile = tempDir.resolve("large.bin").toFile();
         byte[] content = new byte[FileRequest.SMALL_FILE_LIMIT + 1024];
@@ -124,7 +124,7 @@ public class FileRequestTest {
     }
 
     @Test
-    public void testExecuteChunkedUploadWithNullSession(@TempDir Path tempDir) throws IOException {
+    void testExecuteChunkedUploadWithNullSession(@TempDir Path tempDir) throws IOException {
         File localFile = tempDir.resolve("large.bin").toFile();
         byte[] content = new byte[FileRequest.SMALL_FILE_LIMIT + 1024];
         Files.write(localFile.toPath(), content);
@@ -137,7 +137,7 @@ public class FileRequestTest {
     }
 
     @Test
-    public void testExecuteChunkedUploadWithNullUploadUrl(@TempDir Path tempDir) throws IOException {
+    void testExecuteChunkedUploadWithNullUploadUrl(@TempDir Path tempDir) throws IOException {
         File localFile = tempDir.resolve("large.bin").toFile();
         byte[] content = new byte[FileRequest.SMALL_FILE_LIMIT + 1024];
         Files.write(localFile.toPath(), content);
@@ -152,7 +152,7 @@ public class FileRequestTest {
 
 
     @Test
-    public void testUploadChunkRetriesOnFailure(@TempDir Path tempDir) throws IOException {
+    void testUploadChunkRetriesOnFailure(@TempDir Path tempDir) throws IOException {
         File localFile = tempDir.resolve("large.bin").toFile();
         byte[] content = new byte[FileRequest.SMALL_FILE_LIMIT + 100];
         Files.write(localFile.toPath(), content);
@@ -176,7 +176,7 @@ public class FileRequestTest {
     }
 
     @Test
-    public void testUploadChunkExhaustsRetries(@TempDir Path tempDir) throws IOException {
+    void testUploadChunkExhaustsRetries(@TempDir Path tempDir) throws IOException {
         File localFile = tempDir.resolve("large.bin").toFile();
         byte[] content = new byte[FileRequest.SMALL_FILE_LIMIT + 100];
         Files.write(localFile.toPath(), content);
@@ -197,23 +197,23 @@ public class FileRequestTest {
 
 
     @Test
-    public void testChunkSizeIsMultipleOf320KiB() {
+    void testChunkSizeIsMultipleOf320KiB() {
         assertEquals(0, FileRequest.CHUNK_SIZE % 327680);
     }
 
     @Test
-    public void testSmallFileLimitIs4MB() {
+    void testSmallFileLimitIs4MB() {
         assertEquals(4 * 1024 * 1024, FileRequest.SMALL_FILE_LIMIT);
     }
 
     @Test
-    public void testChunkRetriesIs5() {
+    void testChunkRetriesIs5() {
         assertEquals(5, FileRequest.CHUNK_RETRIES);
     }
 
 
     @Test
-    public void testCreateFactoryMethod(@TempDir Path tempDir) throws IOException {
+    void testCreateFactoryMethod(@TempDir Path tempDir) throws IOException {
         File localFile = tempDir.resolve("test.txt").toFile();
         Files.writeString(localFile.toPath(), "content");
 

@@ -15,17 +15,17 @@ import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 
-public class ODriveCoreContextTest {
+class ODriveCoreContextTest {
 
     private ODriveCoreContext context;
 
     @BeforeEach
-    public void before() {
+    void before() {
         context = new ODriveCoreContext();
     }
 
     @Test
-    public void testOdriveClientRegistration() {
+    void testOdriveClientRegistration() {
         ODriveSetting setting = new ODriveSetting("1.0.0", "test-client-id", "common", "http://127.0.0.1:8783/odrive", 8783, "/odrive");
 
         ClientRegistration registration = context.oDriveClientRegistration(setting);
@@ -44,7 +44,7 @@ public class ODriveCoreContextTest {
     }
 
     @Test
-    public void testOdriveClientRegistrationWithCustomTenant() {
+    void testOdriveClientRegistrationWithCustomTenant() {
         ODriveSetting setting = new ODriveSetting("1.0.0", "my-client", "my-tenant", "http://127.0.0.1:9999/callback", 9999, "/callback");
 
         ClientRegistration registration = context.oDriveClientRegistration(setting);
@@ -58,7 +58,7 @@ public class ODriveCoreContextTest {
     }
 
     @Test
-    public void testAuthorizationCodeTokenResponseClient() {
+    void testAuthorizationCodeTokenResponseClient() {
         OAuth2AccessTokenResponseClient<OAuth2AuthorizationCodeGrantRequest> client =
                 context.authorizationCodeTokenResponseClient();
 
@@ -66,7 +66,7 @@ public class ODriveCoreContextTest {
     }
 
     @Test
-    public void testRefreshTokenResponseClient() {
+    void testRefreshTokenResponseClient() {
         OAuth2AccessTokenResponseClient<OAuth2RefreshTokenGrantRequest> client =
                 context.refreshTokenResponseClient();
 
@@ -74,7 +74,7 @@ public class ODriveCoreContextTest {
     }
 
     @Test
-    public void testOneDriveClient() {
+    void testOneDriveClient() {
         BearerAuthInterceptor interceptor = mock(BearerAuthInterceptor.class);
 
         OneDriveClient client = context.oneDriveClient(interceptor);

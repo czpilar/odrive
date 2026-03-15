@@ -4,10 +4,10 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class UploadSessionTest {
+class UploadSessionTest {
 
     @Test
-    public void testRecordAccessors() {
+    void testRecordAccessors() {
         UploadSession session = new UploadSession("https://upload.example.com/session123", "2026-03-15T12:00:00Z");
 
         assertEquals("https://upload.example.com/session123", session.uploadUrl());
@@ -15,7 +15,7 @@ public class UploadSessionTest {
     }
 
     @Test
-    public void testNullValues() {
+    void testNullValues() {
         UploadSession session = new UploadSession(null, null);
 
         assertNull(session.uploadUrl());
@@ -23,7 +23,7 @@ public class UploadSessionTest {
     }
 
     @Test
-    public void testEquality() {
+    void testEquality() {
         UploadSession session1 = new UploadSession("url", "expiry");
         UploadSession session2 = new UploadSession("url", "expiry");
 
@@ -32,7 +32,7 @@ public class UploadSessionTest {
     }
 
     @Test
-    public void testInequality() {
+    void testInequality() {
         UploadSession session1 = new UploadSession("url1", "expiry1");
         UploadSession session2 = new UploadSession("url2", "expiry2");
 

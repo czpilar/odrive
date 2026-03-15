@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-public class OneDriveClientTest {
+class OneDriveClientTest {
 
     private static final String ACCESS_TOKEN = "test-access-token";
     private static final String GRAPH_BASE_URL = "https://graph.microsoft.com/v1.0";
@@ -39,13 +39,13 @@ public class OneDriveClientTest {
     private AutoCloseable autoCloseable;
 
     @BeforeEach
-    public void before() {
+    void before() {
         autoCloseable = MockitoAnnotations.openMocks(this);
         client = new OneDriveClient(restTemplate, chunkRestTemplate);
     }
 
     @AfterEach
-    public void after() throws Exception {
+    void after() throws Exception {
         autoCloseable.close();
     }
 
@@ -59,7 +59,7 @@ public class OneDriveClientTest {
 
 
     @Test
-    public void testGetItemByPath() {
+    void testGetItemByPath() {
         DriveItem item = driveItem("item-id");
         ResponseEntity<DriveItem> response = new ResponseEntity<>(item, HttpStatus.OK);
 
@@ -77,7 +77,7 @@ public class OneDriveClientTest {
     }
 
     @Test
-    public void testGetItemByPathNotFound() {
+    void testGetItemByPathNotFound() {
         when(restTemplate.exchange(anyString(), eq(HttpMethod.GET), any(HttpEntity.class), eq(DriveItem.class)))
                 .thenThrow(HttpClientErrorException.NotFound.class);
 
@@ -87,7 +87,7 @@ public class OneDriveClientTest {
     }
 
     @Test
-    public void testGetItemByPathApiError() {
+    void testGetItemByPathApiError() {
         when(restTemplate.exchange(anyString(), eq(HttpMethod.GET), any(HttpEntity.class), eq(DriveItem.class)))
                 .thenThrow(new HttpClientErrorException(HttpStatus.FORBIDDEN, "Forbidden"));
 
@@ -95,7 +95,7 @@ public class OneDriveClientTest {
     }
 
     @Test
-    public void testGetItemByPathWithLeadingSlash() {
+    void testGetItemByPathWithLeadingSlash() {
         ResponseEntity<DriveItem> response = new ResponseEntity<>(emptyDriveItem(), HttpStatus.OK);
         when(restTemplate.exchange(anyString(), eq(HttpMethod.GET), any(HttpEntity.class), eq(DriveItem.class)))
                 .thenReturn(response);
@@ -108,7 +108,7 @@ public class OneDriveClientTest {
     }
 
     @Test
-    public void testGetItemByPathWithSpacesInPath() {
+    void testGetItemByPathWithSpacesInPath() {
         ResponseEntity<DriveItem> response = new ResponseEntity<>(emptyDriveItem(), HttpStatus.OK);
         when(restTemplate.exchange(anyString(), eq(HttpMethod.GET), any(HttpEntity.class), eq(DriveItem.class)))
                 .thenReturn(response);
@@ -122,7 +122,7 @@ public class OneDriveClientTest {
 
 
     @Test
-    public void testCreateFolderAtRoot() {
+    void testCreateFolderAtRoot() {
         DriveItem folder = driveItem("folder-id");
         ResponseEntity<DriveItem> response = new ResponseEntity<>(folder, HttpStatus.CREATED);
 
@@ -140,7 +140,7 @@ public class OneDriveClientTest {
     }
 
     @Test
-    public void testCreateFolderAtRootApiError() {
+    void testCreateFolderAtRootApiError() {
         when(restTemplate.exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class), eq(DriveItem.class)))
                 .thenThrow(new HttpClientErrorException(HttpStatus.CONFLICT, "Conflict"));
 
@@ -149,7 +149,7 @@ public class OneDriveClientTest {
 
 
     @Test
-    public void testCreateFolder() {
+    void testCreateFolder() {
         DriveItem folder = driveItem("subfolder-id");
         ResponseEntity<DriveItem> response = new ResponseEntity<>(folder, HttpStatus.CREATED);
 
@@ -167,7 +167,7 @@ public class OneDriveClientTest {
     }
 
     @Test
-    public void testCreateFolderApiError() {
+    void testCreateFolderApiError() {
         when(restTemplate.exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class), eq(DriveItem.class)))
                 .thenThrow(new HttpClientErrorException(HttpStatus.FORBIDDEN, "Forbidden"));
 
@@ -176,7 +176,7 @@ public class OneDriveClientTest {
 
 
     @Test
-    public void testUploadSmallFile(@TempDir Path tempDir) throws IOException {
+    void testUploadSmallFile(@TempDir Path tempDir) throws IOException {
         File localFile = tempDir.resolve("test.txt").toFile();
         Files.writeString(localFile.toPath(), "test content");
 
@@ -197,7 +197,7 @@ public class OneDriveClientTest {
     }
 
     @Test
-    public void testUploadSmallFileWithNonExistentFile() {
+    void testUploadSmallFileWithNonExistentFile() {
         File localFile = new File("non-existent-file.txt");
 
         assertThrows(OneDriveClientException.class,
@@ -205,7 +205,7 @@ public class OneDriveClientTest {
     }
 
     @Test
-    public void testUploadSmallFileApiError(@TempDir Path tempDir) throws IOException {
+    void testUploadSmallFileApiError(@TempDir Path tempDir) throws IOException {
         File localFile = tempDir.resolve("test.txt").toFile();
         Files.writeString(localFile.toPath(), "test content");
 
@@ -218,7 +218,7 @@ public class OneDriveClientTest {
 
 
     @Test
-    public void testCreateUploadSession() {
+    void testCreateUploadSession() {
         UploadSession session = new UploadSession("https://upload.example.com/session123", null);
         ResponseEntity<UploadSession> response = new ResponseEntity<>(session, HttpStatus.OK);
 
@@ -236,7 +236,7 @@ public class OneDriveClientTest {
     }
 
     @Test
-    public void testCreateUploadSessionApiError() {
+    void testCreateUploadSessionApiError() {
         when(restTemplate.exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class), eq(UploadSession.class)))
                 .thenThrow(new HttpClientErrorException(HttpStatus.FORBIDDEN, "Forbidden"));
 
@@ -246,7 +246,7 @@ public class OneDriveClientTest {
 
 
     @Test
-    public void testUploadChunkComplete() {
+    void testUploadChunkComplete() {
         DriveItem item = driveItem("completed-id");
         ResponseEntity<DriveItem> response = new ResponseEntity<>(item, HttpStatus.OK);
 
@@ -261,7 +261,7 @@ public class OneDriveClientTest {
     }
 
     @Test
-    public void testUploadChunkCreated() {
+    void testUploadChunkCreated() {
         DriveItem item = driveItem("created-id");
         ResponseEntity<DriveItem> response = new ResponseEntity<>(item, HttpStatus.CREATED);
 
@@ -276,7 +276,7 @@ public class OneDriveClientTest {
     }
 
     @Test
-    public void testUploadChunkAccepted() {
+    void testUploadChunkAccepted() {
         ResponseEntity<DriveItem> response = ResponseEntity.status(HttpStatus.ACCEPTED).build();
 
         when(chunkRestTemplate.exchange(anyString(), eq(HttpMethod.PUT), any(HttpEntity.class), eq(DriveItem.class)))
@@ -289,7 +289,7 @@ public class OneDriveClientTest {
     }
 
     @Test
-    public void testUploadChunkApiError() {
+    void testUploadChunkApiError() {
         when(chunkRestTemplate.exchange(anyString(), eq(HttpMethod.PUT), any(HttpEntity.class), eq(DriveItem.class)))
                 .thenThrow(new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR, "Server Error"));
 
@@ -299,7 +299,7 @@ public class OneDriveClientTest {
     }
 
     @Test
-    public void testUploadChunkContentRangeHeader() {
+    void testUploadChunkContentRangeHeader() {
         ResponseEntity<DriveItem> response = ResponseEntity.status(HttpStatus.ACCEPTED).build();
         when(chunkRestTemplate.exchange(anyString(), eq(HttpMethod.PUT), any(HttpEntity.class), eq(DriveItem.class)))
                 .thenReturn(response);
@@ -319,7 +319,7 @@ public class OneDriveClientTest {
 
 
     @Test
-    public void testOneDriveClientExceptionWithMessage() {
+    void testOneDriveClientExceptionWithMessage() {
         OneDriveClientException ex = new OneDriveClientException("test message");
 
         assertInstanceOf(net.czpilar.odrive.core.exception.ODriveException.class, ex);
@@ -328,7 +328,7 @@ public class OneDriveClientTest {
     }
 
     @Test
-    public void testOneDriveClientExceptionWithMessageAndCause() {
+    void testOneDriveClientExceptionWithMessageAndCause() {
         RuntimeException cause = new RuntimeException("cause");
         OneDriveClientException ex = new OneDriveClientException("test message", cause);
 

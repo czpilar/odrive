@@ -17,31 +17,31 @@ import java.nio.file.Path;
 import static net.czpilar.odrive.cmd.runner.impl.ODriveCmdRunner.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class ODriveCmdContextTest {
+class ODriveCmdContextTest {
 
     private ODriveCmdContext context;
 
     @BeforeEach
-    public void before() {
+    void before() {
         context = new ODriveCmdContext();
     }
 
     @Test
-    public void testConstants() {
+    void testConstants() {
         assertEquals("odrive.uploadDir", ODriveCmdContext.UPLOAD_DIR_PROPERTY_KEY);
         assertEquals("odrive.refreshToken", ODriveCmdContext.REFRESH_TOKEN_PROPERTY_KEY);
         assertEquals("odrive-uploads", ODriveCmdContext.DEFAULT_UPLOAD_DIR);
     }
 
     @Test
-    public void testPropertiesODriveCredential() {
+    void testPropertiesODriveCredential() {
         PropertiesODriveCredential credential = context.propertiesODriveCredential();
 
         assertNotNull(credential);
     }
 
     @Test
-    public void testPropertiesODriveCredentialDefaultUploadDir(@TempDir Path tempDir) throws IOException {
+    void testPropertiesODriveCredentialDefaultUploadDir(@TempDir Path tempDir) throws IOException {
         PropertiesODriveCredential credential = context.propertiesODriveCredential();
         File propertyFile = tempDir.resolve("test.properties").toFile();
         Files.writeString(propertyFile.toPath(), "");
@@ -51,28 +51,28 @@ public class ODriveCmdContextTest {
     }
 
     @Test
-    public void testHelpFormatter() {
+    void testHelpFormatter() {
         HelpFormatter formatter = context.helpFormatter();
 
         assertNotNull(formatter);
     }
 
     @Test
-    public void testDefaultParser() {
+    void testDefaultParser() {
         DefaultParser parser = context.defaultParser();
 
         assertNotNull(parser);
     }
 
     @Test
-    public void testOptions() {
+    void testOptions() {
         Options options = context.options();
 
         assertNotNull(options);
     }
 
     @Test
-    public void testOptionsContainsAllExpectedOptions() {
+    void testOptionsContainsAllExpectedOptions() {
         Options options = context.options();
 
         assertNotNull(options.getOption(OPTION_VERSION));
@@ -85,14 +85,14 @@ public class ODriveCmdContextTest {
     }
 
     @Test
-    public void testOptionsCount() {
+    void testOptionsCount() {
         Options options = context.options();
 
         assertEquals(7, options.getOptions().size());
     }
 
     @Test
-    public void testVersionOption() {
+    void testVersionOption() {
         Option option = context.options().getOption(OPTION_VERSION);
 
         assertFalse(option.hasArg());
@@ -100,7 +100,7 @@ public class ODriveCmdContextTest {
     }
 
     @Test
-    public void testHelpOption() {
+    void testHelpOption() {
         Option option = context.options().getOption(OPTION_HELP);
 
         assertFalse(option.hasArg());
@@ -108,7 +108,7 @@ public class ODriveCmdContextTest {
     }
 
     @Test
-    public void testLinkOption() {
+    void testLinkOption() {
         Option option = context.options().getOption(OPTION_LINK);
 
         assertFalse(option.hasArg());
@@ -116,7 +116,7 @@ public class ODriveCmdContextTest {
     }
 
     @Test
-    public void testAuthorizationOption() {
+    void testAuthorizationOption() {
         Option option = context.options().getOption(OPTION_AUTHORIZATION);
 
         assertTrue(option.hasArg());
@@ -126,7 +126,7 @@ public class ODriveCmdContextTest {
     }
 
     @Test
-    public void testFileOption() {
+    void testFileOption() {
         Option option = context.options().getOption(OPTION_FILE);
 
         assertTrue(option.hasArg());
@@ -136,7 +136,7 @@ public class ODriveCmdContextTest {
     }
 
     @Test
-    public void testDirectoryOption() {
+    void testDirectoryOption() {
         Option option = context.options().getOption(OPTION_DIRECTORY);
 
         assertTrue(option.hasArg());
@@ -145,7 +145,7 @@ public class ODriveCmdContextTest {
     }
 
     @Test
-    public void testPropertiesOption() {
+    void testPropertiesOption() {
         Option option = context.options().getOption(OPTION_PROPERTIES);
 
         assertTrue(option.hasArg());
