@@ -1,5 +1,8 @@
 package net.czpilar.odrive.core.client;
 
+import net.czpilar.odrive.core.credential.Credential;
+import net.czpilar.odrive.core.credential.loader.CredentialLoader;
+import net.czpilar.odrive.core.service.IAuthorizationService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,8 +15,8 @@ import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.client.HttpClientErrorException;
 
 import java.io.IOException;
-import java.util.function.Supplier;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 public class BearerAuthInterceptorTest {
@@ -28,9 +31,13 @@ public class BearerAuthInterceptorTest {
     private ClientHttpResponse response;
 
     @Mock
-    private Supplier<String> tokenRefresher;
+    private CredentialLoader credentialLoader;
+
+    @Mock
+    private IAuthorizationService authorizationService;
 
     private HttpHeaders headers;
+    private BearerAuthInterceptor interceptor;
     private AutoCloseable autoCloseable;
 
     @BeforeEach
@@ -38,6 +45,7 @@ public class BearerAuthInterceptorTest {
         autoCloseable = MockitoAnnotations.openMocks(this);
         headers = new HttpHeaders();
         when(request.getHeaders()).thenReturn(headers);
+        interceptor = new BearerAuthInterceptor(credentialLoader, authorizationService);
     }
 
     @AfterEach
@@ -47,40 +55,60 @@ public class BearerAuthInterceptorTest {
 
     @Test
     public void testFirstRequestObtainsToken() throws IOException {
-        when(tokenRefresher.get()).thenReturn("access-token");
+        when(credentialLoader.getRefreshToken()).thenReturn("my-refresh-token");
+        when(authorizationService.refreshAccessToken("my-refresh-token"))
+                .thenReturn(new Credential("access-token", "new-refresh-token"));
         when(execution.execute(request, new byte[0])).thenReturn(response);
 
-        BearerAuthInterceptor interceptor = new BearerAuthInterceptor(tokenRefresher);
         interceptor.intercept(request, new byte[0], execution);
 
-        verify(tokenRefresher).get();
+        verify(credentialLoader).getRefreshToken();
+        verify(authorizationService).refreshAccessToken("my-refresh-token");
         verify(execution).execute(request, new byte[0]);
+        assertEquals("Bearer access-token", headers.getFirst("Authorization"));
     }
 
     @Test
     public void testSecondRequestReusesToken() throws IOException {
-        when(tokenRefresher.get()).thenReturn("access-token");
+        when(credentialLoader.getRefreshToken()).thenReturn("my-refresh-token");
+        when(authorizationService.refreshAccessToken("my-refresh-token"))
+                .thenReturn(new Credential("access-token", "new-refresh-token"));
         when(execution.execute(request, new byte[0])).thenReturn(response);
 
-        BearerAuthInterceptor interceptor = new BearerAuthInterceptor(tokenRefresher);
         interceptor.intercept(request, new byte[0], execution);
         interceptor.intercept(request, new byte[0], execution);
 
-        verify(tokenRefresher, times(1)).get();
+        verify(credentialLoader, times(1)).getRefreshToken();
+        verify(authorizationService, times(1)).refreshAccessToken("my-refresh-token");
         verify(execution, times(2)).execute(request, new byte[0]);
     }
 
     @Test
     public void testRefreshesTokenOn401() throws IOException {
-        when(tokenRefresher.get()).thenReturn("old-token", "new-token");
+        when(credentialLoader.getRefreshToken()).thenReturn("my-refresh-token");
+        when(authorizationService.refreshAccessToken("my-refresh-token"))
+                .thenReturn(new Credential("old-token", "rt1"))
+                .thenReturn(new Credential("new-token", "rt2"));
         when(execution.execute(request, new byte[0]))
                 .thenThrow(mock(HttpClientErrorException.Unauthorized.class))
                 .thenReturn(response);
 
-        BearerAuthInterceptor interceptor = new BearerAuthInterceptor(tokenRefresher);
         interceptor.intercept(request, new byte[0], execution);
 
-        verify(tokenRefresher, times(2)).get();
+        verify(credentialLoader, times(2)).getRefreshToken();
+        verify(authorizationService, times(2)).refreshAccessToken("my-refresh-token");
         verify(execution, times(2)).execute(request, new byte[0]);
+        assertEquals("Bearer new-token", headers.getFirst("Authorization"));
+    }
+
+    @Test
+    public void testReturnsNullTokenWhenNoRefreshToken() throws IOException {
+        when(credentialLoader.getRefreshToken()).thenReturn(null);
+        when(execution.execute(request, new byte[0])).thenReturn(response);
+
+        interceptor.intercept(request, new byte[0], execution);
+
+        verify(credentialLoader).getRefreshToken();
+        verifyNoInteractions(authorizationService);
     }
 }

@@ -2,7 +2,6 @@ package net.czpilar.odrive.core.context;
 
 import net.czpilar.odrive.core.client.BearerAuthInterceptor;
 import net.czpilar.odrive.core.client.OneDriveClient;
-import net.czpilar.odrive.core.client.TokenRefresher;
 import net.czpilar.odrive.core.setting.ODriveSetting;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,13 +30,13 @@ public class ODriveCoreContextTest {
     }
 
     @Test
-    public void testMicrosoftClientRegistration() {
+    public void testOdriveClientRegistration() {
         ODriveSetting setting = new ODriveSetting("1.0.0", "test-client-id", "common", 8783, "/odrive");
 
-        ClientRegistration registration = context.microsoftClientRegistration(setting);
+        ClientRegistration registration = context.oDriveClientRegistration(setting);
 
         assertNotNull(registration);
-        assertEquals("microsoft", registration.getRegistrationId());
+        assertEquals("odrive-core-idp-client", registration.getRegistrationId());
         assertEquals("test-client-id", registration.getClientId());
         assertEquals(ClientAuthenticationMethod.NONE, registration.getClientAuthenticationMethod());
         assertEquals(AuthorizationGrantType.AUTHORIZATION_CODE, registration.getAuthorizationGrantType());
@@ -50,10 +49,10 @@ public class ODriveCoreContextTest {
     }
 
     @Test
-    public void testMicrosoftClientRegistrationWithCustomTenant() {
+    public void testOdriveClientRegistrationWithCustomTenant() {
         ODriveSetting setting = new ODriveSetting("1.0.0", "my-client", "my-tenant", 9999, "/callback");
 
-        ClientRegistration registration = context.microsoftClientRegistration(setting);
+        ClientRegistration registration = context.oDriveClientRegistration(setting);
 
         assertEquals("my-client", registration.getClientId());
         assertEquals("http://127.0.0.1:9999/callback", registration.getRedirectUri());
@@ -111,15 +110,6 @@ public class ODriveCoreContextTest {
                 .filter(c -> c instanceof JacksonJsonHttpMessageConverter)
                 .count();
         assertEquals(1, count);
-    }
-
-    @Test
-    public void testBearerAuthInterceptor() {
-        TokenRefresher tokenRefresher = mock(TokenRefresher.class);
-
-        BearerAuthInterceptor interceptor = context.bearerAuthInterceptor(tokenRefresher);
-
-        assertNotNull(interceptor);
     }
 
     @Test

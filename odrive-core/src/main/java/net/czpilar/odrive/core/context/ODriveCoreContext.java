@@ -2,7 +2,6 @@ package net.czpilar.odrive.core.context;
 
 import net.czpilar.odrive.core.client.BearerAuthInterceptor;
 import net.czpilar.odrive.core.client.OneDriveClient;
-import net.czpilar.odrive.core.client.TokenRefresher;
 import net.czpilar.odrive.core.setting.ODriveSetting;
 import org.springframework.context.annotation.*;
 import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter;
@@ -30,8 +29,8 @@ import tools.jackson.databind.json.JsonMapper;
 public class ODriveCoreContext {
 
     @Bean
-    public ClientRegistration microsoftClientRegistration(ODriveSetting setting) {
-        return ClientRegistration.withRegistrationId("microsoft")
+    public ClientRegistration oDriveClientRegistration(ODriveSetting setting) {
+        return ClientRegistration.withRegistrationId("odrive-core-idp-client")
                 .clientId(setting.getClientId())
                 .clientAuthenticationMethod(ClientAuthenticationMethod.NONE)
                 .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
@@ -66,12 +65,6 @@ public class ODriveCoreContext {
         restTemplate.getMessageConverters().addFirst(jacksonConverter);
 
         return restTemplate;
-    }
-
-    @Bean
-    @Lazy
-    public BearerAuthInterceptor bearerAuthInterceptor(TokenRefresher tokenRefresher) {
-        return new BearerAuthInterceptor(tokenRefresher);
     }
 
     @Bean
