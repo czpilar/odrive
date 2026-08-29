@@ -57,8 +57,12 @@ oDrive core can be used in any other application to provide ability for uploadin
    or use `SimpleODriveCredential` or extend `AbstractODriveCredential`
 2. provide client ID as `odrive.core.drive.clientId` property in spring context
 3. optionally provide tenant as `odrive.core.drive.tenant` property in spring context (default is `common`)
-4. import oDrive spring context with annotation @Import(net.czpilar.odrive.core.context.ODriveCoreContext.class)
-5. autowire `IFileService` and use file uploading methods
+4. provide redirect URI as `odrive.core.drive.redirectUri` property in spring context
+5. provide redirect URI port as `odrive.core.drive.redirectUri.port` property in spring context
+6. provide redirect URI context path as `odrive.core.drive.redirectUri.context` property in spring context
+7. provide application version as `odrive.version` property in spring context
+8. import oDrive spring context with annotation @Import(net.czpilar.odrive.core.context.ODriveCoreContext.class)
+9. autowire `IFileService` and use file uploading methods
 
 License
 =======
